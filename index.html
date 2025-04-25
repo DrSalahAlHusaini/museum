@@ -886,16 +886,100 @@
       <div class="info-value">${document.getElementById('source').value}</div>
     </div>` : ''}
     
+    ${document.getElementById('acquisition_date').value ? `
+    <div class="info-row">
+      <div class="info-label">تاريخ الحيازة:</div>
+      <div class="info-value">${document.getElementById('acquisition_date').value}</div>
+    </div>` : ''}
+    
     ${document.getElementById('material').value ? `
     <div class="info-row">
       <div class="info-label">المادة:</div>
       <div class="info-value">${document.getElementById('material').value}</div>
     </div>` : ''}
     
+    ${document.getElementById('color').value ? `
+    <div class="info-row">
+      <div class="info-label">اللون:</div>
+      <div class="info-value">${document.getElementById('color').value}</div>
+    </div>` : ''}
+    
     ${document.getElementById('dimensions').value ? `
     <div class="info-row">
       <div class="info-label">المقاسات:</div>
       <div class="info-value">${document.getElementById('dimensions').value}</div>
+    </div>` : ''}
+    
+    ${document.getElementById('time_period').value ? `
+    <div class="info-row">
+      <div class="info-label">الفترة الزمنية:</div>
+      <div class="info-value">${document.getElementById('time_period').value}</div>
+    </div>` : ''}
+    
+    ${document.getElementById('condition').value ? `
+    <div class="info-row">
+      <div class="info-label">الحالة العامة:</div>
+      <div class="info-value">${document.getElementById('condition').value}</div>
+    </div>` : ''}
+    
+    ${document.getElementById('catalog_number').value ? `
+    <div class="info-row">
+      <div class="info-label">رقم الكتالوج:</div>
+      <div class="info-value">${document.getElementById('catalog_number').value}</div>
+    </div>` : ''}
+    
+    ${document.getElementById('card_number').value ? `
+    <div class="info-row">
+      <div class="info-label">رقم البطاقة:</div>
+      <div class="info-value">${document.getElementById('card_number').value}</div>
+    </div>` : ''}
+    
+    ${document.getElementById('guide_number').value ? `
+    <div class="info-row">
+      <div class="info-label">رقم الدليل:</div>
+      <div class="info-value">${document.getElementById('guide_number').value}</div>
+    </div>` : ''}
+    
+    ${document.getElementById('previous_number').value ? `
+    <div class="info-row">
+      <div class="info-label">رقم سابق:</div>
+      <div class="info-value">${document.getElementById('previous_number').value}</div>
+    </div>` : ''}
+    
+    ${document.getElementById('storage_location').value ? `
+    <div class="info-row">
+      <div class="info-label">مكان الحفظ الحالي:</div>
+      <div class="info-value">${document.getElementById('storage_location').value}</div>
+    </div>` : ''}
+    
+    ${document.getElementById('room').value ? `
+    <div class="info-row">
+      <div class="info-label">الغرفة/القاعة:</div>
+      <div class="info-value">${document.getElementById('room').value}</div>
+    </div>` : ''}
+    
+    ${document.getElementById('safe').value ? `
+    <div class="info-row">
+      <div class="info-label">الخزنة/العرض:</div>
+      <div class="info-value">${document.getElementById('safe').value}</div>
+    </div>` : ''}
+    
+    ${document.getElementById('storage').value ? `
+    <div class="info-row">
+      <div class="info-label">المخزن:</div>
+      <div class="info-value">${document.getElementById('storage').value}</div>
+    </div>` : ''}
+    
+    ${document.getElementById('shelf').value ? `
+    <div class="info-row">
+      <div class="info-label">الرف/الوحدة:</div>
+      <div class="info-value">${document.getElementById('shelf').value}</div>
+    </div>` : ''}
+    
+    ${document.getElementById('previous_location').value ? `
+    <div class="info-row">
+      <div class="info-label">المكان السابق للحفظ:</div>
+      <div class="info-value">${document.getElementById('previous_location').value}</div>
     </div>` : ''}
     
     ${imageFileName ? `
@@ -965,6 +1049,3 @@
   document.getElementById('saveBtn').addEventListener('click', saveArtifact);
   document.getElementById('openIndexBtn').addEventListener('click', openArtifactsIndex);
 </script>
-
-</body>
-</html>
