@@ -487,7 +487,7 @@
         <div class="form-row">
           <div class="form-group">
             <label>المادة:</label>
-            <input type="text" id="material" placeholder="مثل: خزف، برونز">
+            <input type="text" id="material" placeholder="مثل: خزف، برونز، فخار، حجر">
           </div>
           <div class="form-group">
             <label>اللون:</label>
@@ -502,7 +502,7 @@
         
         <div class="form-group">
           <label>الفترة الزمنية:</label>
-          <input type="text" id="time_period" placeholder="مثل: العصر الإسلامي المبكر">
+          <input type="text" id="time_period" placeholder="مثل: القرن ..">
         </div>
         
         <div class="form-group">
@@ -903,31 +903,35 @@
     }
   }
 
-  // دالة لفتح فهرس القطع الأثرية
-  async function openArtifactsIndex() {
-    try {
-      if (baseFolderHandle) {
-        try {
-          const fileHandle = await baseFolderHandle.getFileHandle('artifacts_index.html');
-          const file = await fileHandle.getFile();
-          const url = URL.createObjectURL(file);
-          window.open(url, '_blank');
-          return;
-        } catch (e) {
-          console.log('لم يتم العثور على الفهرس في المجلد المحدد');
+        // دالة لفتح فهرس القطع الأثرية
+        async function openArtifactsIndex() {
+            try {
+                if (baseFolderHandle) {
+                    // حاول فتح الفهرس من المجلد المحدد
+                    try {
+                        const fileHandle = await baseFolderHandle.getFileHandle('artifacts_index.html');
+                        const file = await fileHandle.getFile();
+                        const url = URL.createObjectURL(file);
+                        window.open(url, '_blank');
+                        return;
+                    } catch (e) {
+                        console.log('لم يتم العثور على الفهرس في المجلد المحدد');
+                    }
+                }
+                
+                // فتح الفهرس العام إذا لم يكن في المجلد المحدد
+                window.open('artifacts_index.html', '_blank');
+            } catch (error) {
+                console.error('حدث خطأ أثناء محاولة فتح الفهرس:', error);
+                window.open('artifacts_index.html', '_blank');
+            }
         }
-      }
-      
-      window.open('artifacts_index.html', '_blank');
-    } catch (error) {
-      console.error('حدث خطأ أثناء محاولة فتح الفهرس:', error);
-      window.open('artifacts_index.html', '_blank');
-    }
-  }
 
-  // إضافة مستمع الأحداث
-  document.getElementById('openIndexBtn').addEventListener('click', openArtifactsIndex);
-  document.getElementById('saveBtn').addEventListener('click', saveArtifact);
+        // إضافة مستمع الأحداث للزر الجديد
+        document.getElementById('openIndexBtn').addEventListener('click', openArtifactsIndex);
+    </script>
+</body>
+</html>
 
   // التحقق من الحقول المطلوبة
   document.getElementById('artifactForm').addEventListener('submit', function(e) {
