@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منشئ فهرس القطع الأثرية</title>
+    <style>
+        body {
+            font-family: 'Tahoma', sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+            margin: 20px;
+            direction: rtl;
+        }
+        h1 {
+            text-align: center;
+            color: #0056b3;
+            margin-bottom: 30px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            margin: 20px auto;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        #fileList {
+            list-style: none;
+            padding: 0;
+        }
+        .file-item {
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+        .file-link {
+            color: #007BFF;
+            text-decoration: none;
+        }
+        .file-link:hover {
+            text-decoration: underline;
+        }
+        #status {
+            text-align: center;
+            margin: 20px 0;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .warning {
+            background-color: #fff3cd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border: 1px solid #ffeeba;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>منشئ فهرس القطع الأثرية</h1>
+        
+        <div class="warning">
+            <h3>ملاحظات هامة:</h3>
+            <p>1. يعمل هذا الحل فقط في متصفحات Chrome و Edge الإصدارات الحديثة</p>
+            <p>2. يجب فتح الموقع عبر خادم محلي (مثل Live Server في VS Code)</p>
+            <p>3. سيطلب منك المتصفح إذن الوصول إلى المجلد</p>
+        </div>
+
+        <button id="selectFolder">اختيار مجلد artifacts</button>
+        
+        <div id="status"></div>
+        
+        <ul id="fileList"></ul>
+        
+        <button id="generateIndex" style="display:none;">إنشاء ملف الفهرس</button>
+    </div>
+
+    <script>
+        let folderHandle;
+        const fileList = document.getElementById('fileList');
+        const statusDiv = document.getElementById('status');
+        const selectFolderBtn = document.getElementById('selectFolder');
+        const generateIndexBtn = document.getElementById('generateIndex');
+        
+        // اختيار المجلد
+        selectFolderBtn.addEventListener('click', async () => {
+            try {
+                folderHandle = await window.showDirectoryPicker();
+                statusDiv.textContent = 'جاري قراءة محتويات المجلد...';
+                statusDiv.className = '';
+                
+                // قراءة الملفات
+                const files = [];
+                for await (const entry of folderHandle.values()) {
+                    if (entry.kind === 'file' && entry.name.endsWith('.html')) {
+                        files.push(entry.name);
+                    }
+                }
+                
+                if (files.length === 0) {
+                    statusDiv.textContent = 'لم يتم العثور على ملفات HTML في المجلد المحدد';
+                    statusDiv.className = 'error';
+                    fileList.innerHTML = '';
+                    generateIndexBtn.style.display = 'none';
+                    return;
+                }
+                
+                // عرض الملفات
+                fileList.innerHTML = '';
+                files.forEach(file => {
+                    const li = document.createElement('li');
+                    li.className = 'file-item';
+                    li.innerHTML = `
+                        <span>${file}</span>
+                        <a href="#" class="file-link" data-file="${file}">معاينة</a>
+                    `;
+                    fileList.appendChild(li);
+                });
+                
+                // إضافة معالجات أحداث لروابط المعاينة
+                document.querySelectorAll('.file-link').forEach(link => {
+                    link.addEventListener('click', async (e) => {
+                        e.preventDefault();
+                        const fileName = e.target.getAttribute('data-file');
+                        try {
+                            const fileHandle = await folderHandle.getFileHandle(fileName);
+                            const file = await fileHandle.getFile();
+                            const fileUrl = URL.createObjectURL(file);
+                            window.open(fileUrl, '_blank');
+                        } catch (error) {
+                            statusDiv.textContent = `خطأ في فتح الملف: ${error.message}`;
+                            statusDiv.className = 'error';
+                        }
+                    });
+                });
+                
+                statusDiv.textContent = `تم العثور على ${files.length} ملفات HTML`;
+                statusDiv.className = 'success';
+                generateIndexBtn.style.display = 'block';
+                
+            } catch (error) {
+                if (error.name !== 'AbortError') {
+                    statusDiv.textContent = `حدث خطأ: ${error.message}`;
+                    statusDiv.className = 'error';
+                }
+            }
+        });
+        
+        // إنشاء ملف الفهرس
+        generateIndexBtn.addEventListener('click', async () => {
+            try {
+                statusDiv.textContent = 'جاري إنشاء ملف الفهرس...';
+                statusDiv.className = '';
+                
+                // جمع أسماء الملفات
+                const files = [];
+                for await (const entry of folderHandle.values()) {
+                    if (entry.kind === 'file' && entry.name.endsWith('.html')) {
+                        files.push(entry.name);
+                    }
+                }
+                
+                // إنشاء محتوى HTML للفهرس
+                let htmlContent = `<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>فهرس القطع الأثرية</title>
+    <style>
+        body {
+            font-family: 'Tahoma', sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+            margin: 20px;
+            direction: rtl;
+        }
+        h1 {
+            text-align: center;
+            color: #0056b3;
+            margin-bottom: 30px;
+        }
+        .artifact-list {
+            list-style: none;
+            padding: 0;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .artifact-item {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .artifact-link {
+            color: #007BFF;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .artifact-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>فهرس القطع الأثرية</h1>
+    <ul class="artifact-list">\n`;
+                
+                files.forEach(file => {
+                    const fileName = file.replace('.html', '');
+                    htmlContent += `        <li class="artifact-item">
+            <a href="${file}" class="artifact-link">القطعة رقم ${fileName}</a>
+        </li>\n`;
+                });
+                
+                htmlContent += `    </ul>
+</body>
+</html>`;
+                
+                // حفظ ملف الفهرس
+                const indexFileHandle = await folderHandle.getFileHandle('artifacts_index.html', { create: true });
+                const writable = await indexFileHandle.createWritable();
+                await writable.write(htmlContent);
+                await writable.close();
+                
+                statusDiv.textContent = 'تم إنشاء ملف الفهرس بنجاح باسم artifacts_index.html';
+                statusDiv.className = 'success';
+                
+                // فتح الفهرس الجديد
+                const fileHandle = await folderHandle.getFileHandle('artifacts_index.html');
+                const file = await fileHandle.getFile();
+                const fileUrl = URL.createObjectURL(file);
+                window.open(fileUrl, '_blank');
+                
+            } catch (error) {
+                statusDiv.textContent = `حدث خطأ أثناء إنشاء الفهرس: ${error.message}`;
+                statusDiv.className = 'error';
+            }
+        });
+    </script>
+</body>
+</html>

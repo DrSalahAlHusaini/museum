@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>برنامج توثيق القطع الأثرية والتراثية في المتاحف</title>
+    <style>
+        body {
+            font-family: 'Tahoma', sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+            margin: 20px;
+            direction: rtl;
+        }
+        h1 {
+            text-align: center;
+            color: #0056b3;
+            margin-bottom: 20px;
+        }
+        form {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        label {
+            color: #495057;
+            font-weight: bold;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+        textarea {
+            resize: vertical;
+        }
+        input:focus, textarea:focus, select:focus {
+            border-color: #0056b3;
+            outline: none;
+        }
+        .full-width {
+            grid-column: span 2;
+        }
+        .image-preview {
+            grid-column: span 2;
+            text-align: center;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
+        button {
+            grid-column: span 2;
+            padding: 10px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        #status-message {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .folder-info {
+            grid-column: span 2;
+            text-align: center;
+            padding: 10px;
+            background-color: #e2e3e5;
+            border-radius: 4px;
+        }
+        .index-btn-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .index-btn {
+            padding: 10px 20px;
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .index-btn:hover {
+            background-color: #5a6268;
+        }
+    </style>
+</head>
+<body>
+    <h1>برنامج توثيق القطع الأثرية والتراثية في المتاحف</h1>
+    
+    <div class="index-btn-container">
+        <button class="index-btn" id="openIndexBtn">عرض فهرس القطع الأثرية</button>
+    </div>
+
+    <form id="artifact-form">
+        <div class="folder-info" id="folder-info">
+            لم يتم اختيار مجلد الحفظ بعد
+        </div>
+
+        <div class="full-width">
+            <label for="museum-name">اسم المتحف:</label>
+            <input type="text" id="museum-name" name="museum-name" required>
+        </div>
+
+        <label for="artifact-number">رقم القطعة:</label>
+        <input type="text" id="artifact-number" name="artifact-number" required>
+
+        <label for="artifact-type">نوع القطعة:</label>
+        <input type="text" id="artifact-type" name="artifact-type" required>
+
+        <label for="discovery-location">مكان العثور:</label>
+        <input type="text" id="discovery-location" name="discovery-location" required>
+
+        <label for="artifact-condition">حالة القطعة:</label>
+        <input type="text" id="artifact-condition" name="artifact-condition" required>
+
+        <label for="dimensions">المقاسات:</label>
+        <input type="text" id="dimensions" name="dimensions" required>
+
+        <label for="material">المادة:</label>
+        <input type="text" id="material" name="material" required>
+
+        <label for="color">اللون:</label>
+        <input type="text" id="color" name="color" required>
+
+        <label for="time-period">الفترة الزمنية:</label>
+        <input type="text" id="time-period" name="time-period" required>
+
+        <div class="full-width">
+            <label for="image">الصورة:</label>
+            <input type="file" id="image" name="image" accept="image/*" onchange="previewImage(event)">
+        </div>
+
+        <div class="image-preview">
+            <label>عرض الصورة:</label>
+            <img id="image-display" src="#" alt="لا توجد صورة مرفوعة">
+        </div>
+
+        <div class="full-width">
+            <label for="description">الوصف:</label>
+            <textarea id="description" name="description" rows="4" required></textarea>
+        </div>
+
+        <div class="full-width">
+            <label for="publication">النشر:</label>
+            <textarea id="publication" name="publication" rows="4"></textarea>
+        </div>
+
+        <label for="documentation-date">تاريخ التوثيق:</label>
+        <input type="date" id="documentation-date" name="documentation-date" required>
+
+        <button type="button" onclick="selectFolderAndSave()">اختيار مجلد الحفظ وحفظ القطعة</button>
+    </form>
+
+    <div id="status-message" style="display: none;"></div>
+
+    <script>
+        // تعيين التاريخ الحالي لحقل تاريخ التوثيق
+        const dateField = document.getElementById('documentation-date');
+        const today = new Date().toISOString().split('T')[0];
+        dateField.value = today;
+
+        // متغيرات لتخزين مقبض المجلد
+        let artifactsFolderHandle;
+        let uploadsFolderHandle;
+        let baseFolderHandle;
+
+        // عرض الصورة المرفوعة
+        function previewImage(event) {
+            const imageDisplay = document.getElementById('image-display');
+            const file = event.target.files[0];
+            if (file) {
+                imageDisplay.src = URL.createObjectURL(file);
+                imageDisplay.alt = "الصورة المرفوعة";
+            }
+        }
+
+        // دالة لاختيار المجلد الأساسي
+        async function selectBaseFolder() {
+            try {
+                const dirHandle = await window.showDirectoryPicker();
+                baseFolderHandle = dirHandle;
+                
+                // إنشاء مجلد artifacts إذا لم يكن موجوداً
+                artifactsFolderHandle = await dirHandle.getDirectoryHandle('artifacts', { create: true });
+                
+                // إنشاء مجلد uploads إذا لم يكن موجوداً
+                uploadsFolderHandle = await dirHandle.getDirectoryHandle('uploads', { create: true });
+                
+                document.getElementById('folder-info').textContent = `سيتم الحفظ في: ${dirHandle.name}/artifacts/ و ${dirHandle.name}/uploads/`;
+                showStatusMessage('تم اختيار مجلد الحفظ بنجاح', 'success');
+                return true;
+            } catch (error) {
+                showStatusMessage('لم يتم اختيار مجلد الحفظ', 'error');
+                return false;
+            }
+        }
+
+        // دالة مختصرة لاختيار المجلد ثم الحفظ
+        async function selectFolderAndSave() {
+            if (!baseFolderHandle) {
+                const folderSelected = await selectBaseFolder();
+                if (!folderSelected) return;
+            }
+            await saveArtifact();
+        }
+
+        // دالة لحفظ القطعة الأثرية
+        async function saveArtifact() {
+            const form = document.getElementById('artifact-form');
+            const formData = new FormData(form);
+            const artifactNumber = document.getElementById('artifact-number').value;
+            
+            if (!artifactNumber) {
+                showStatusMessage('يرجى إدخال رقم القطعة', 'error');
+                return;
+            }
+
+            // إنشاء محتوى HTML للقطعة الأثرية
+            let htmlContent = `<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${formData.get('artifact-number')} - ${formData.get('artifact-type')}</title>
+    <style>
+        body {
+            font-family: 'Tahoma', sans-serif;
+            background-color: #f8f9fa;
+            color: #343a40;
+            margin: 20px;
+            direction: rtl;
+        }
+        h1 {
+            color: #0056b3;
+            text-align: center;
+        }
+        .artifact-info {
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            margin: 20px auto;
+        }
+        .info-row {
+            display: flex;
+            margin-bottom: 10px;
+        }
+        .info-label {
+            font-weight: bold;
+            width: 150px;
+            color: #495057;
+        }
+        .info-value {
+            flex: 1;
+        }
+        .artifact-image {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 20px auto;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>${formData.get('artifact-type')} - ${formData.get('artifact-number')}</h1>
+    
+    <div class="artifact-info">
+        <div class="info-row">
+            <div class="info-label">اسم المتحف:</div>
+            <div class="info-value">${formData.get('museum-name')}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">رقم القطعة:</div>
+            <div class="info-value">${formData.get('artifact-number')}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">نوع القطعة:</div>
+            <div class="info-value">${formData.get('artifact-type')}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">مكان العثور:</div>
+            <div class="info-value">${formData.get('discovery-location')}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">حالة القطعة:</div>
+            <div class="info-value">${formData.get('artifact-condition')}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">المقاسات:</div>
+            <div class="info-value">${formData.get('dimensions')}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">المادة:</div>
+            <div class="info-value">${formData.get('material')}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">اللون:</div>
+            <div class="info-value">${formData.get('color')}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">الفترة الزمنية:</div>
+            <div class="info-value">${formData.get('time-period')}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">الوصف:</div>
+            <div class="info-value">${formData.get('description')}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">النشر:</div>
+            <div class="info-value">${formData.get('publication')}</div>
+        </div>
+        <div class="info-row">
+            <div class="info-label">تاريخ التوثيق:</div>
+            <div class="info-value">${formData.get('documentation-date')}</div>
+        </div>`;
+
+            // معالجة الصورة إذا وجدت
+            const imageInput = document.getElementById('image');
+            let imageFileName = '';
+
+            if (imageInput.files && imageInput.files[0]) {
+                const fileExtension = imageInput.files[0].name.split('.').pop();
+                imageFileName = `${artifactNumber}.${fileExtension}`;
+                
+                try {
+                    // حفظ الصورة في مجلد uploads
+                    const imageFileHandle = await uploadsFolderHandle.getFileHandle(imageFileName, { create: true });
+                    const writable = await imageFileHandle.createWritable();
+                    await writable.write(await imageInput.files[0].arrayBuffer());
+                    await writable.close();
+                    
+                    // إضافة مسار الصورة لمحتوى HTML
+                    htmlContent += `
+        <div class="info-row">
+            <div class="info-label">الصورة:</div>
+            <div class="info-value">
+                <img src="../uploads/${imageFileName}" alt="صورة القطعة" class="artifact-image">
+            </div>
+        </div>`;
+                } catch (error) {
+                    console.error('Error saving image:', error);
+                    showStatusMessage('حدث خطأ أثناء حفظ الصورة', 'error');
+                }
+            }
+
+            htmlContent += `</div></body></html>`;
+            
+            try {
+                // حفظ ملف HTML في مجلد artifacts
+                const htmlFileHandle = await artifactsFolderHandle.getFileHandle(`${artifactNumber}.html`, { create: true });
+                const writable = await htmlFileHandle.createWritable();
+                await writable.write(htmlContent);
+                await writable.close();
+                
+                showStatusMessage(`تم حفظ القطعة رقم ${artifactNumber} بنجاح في المجلدات المحددة`, 'success');
+                document.getElementById('artifact-form').reset();
+                document.getElementById('image-display').src = '#';
+                document.getElementById('image-display').alt = 'لا توجد صورة مرفوعة';
+                dateField.value = today;
+            } catch (error) {
+                console.error('Error saving HTML:', error);
+                showStatusMessage('حدث خطأ أثناء حفظ الملف', 'error');
+            }
+        }
+
+        // دالة لعرض رسائل الحالة
+        function showStatusMessage(message, type) {
+            const statusElement = document.getElementById('status-message');
+            statusElement.textContent = message;
+            statusElement.className = type;
+            statusElement.style.display = 'block';
+            
+            setTimeout(() => {
+                statusElement.style.display = 'none';
+            }, 5000);
+        }
+
+        // دالة لفتح فهرس القطع الأثرية
+        async function openArtifactsIndex() {
+            try {
+                if (baseFolderHandle) {
+                    // حاول فتح الفهرس من المجلد المحدد
+                    try {
+                        const fileHandle = await baseFolderHandle.getFileHandle('artifacts_index.html');
+                        const file = await fileHandle.getFile();
+                        const url = URL.createObjectURL(file);
+                        window.open(url, '_blank');
+                        return;
+                    } catch (e) {
+                        console.log('لم يتم العثور على الفهرس في المجلد المحدد');
+                    }
+                }
+                
+                // فتح الفهرس العام إذا لم يكن في المجلد المحدد
+                window.open('artifacts_index.html', '_blank');
+            } catch (error) {
+                console.error('حدث خطأ أثناء محاولة فتح الفهرس:', error);
+                window.open('artifacts_index.html', '_blank');
+            }
+        }
+
+        // إضافة مستمع الأحداث للزر الجديد
+        document.getElementById('openIndexBtn').addEventListener('click', openArtifactsIndex);
+    </script>
+</body>
+</html>
