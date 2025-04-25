@@ -1,436 +1,998 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>برنامج توثيق القطع الأثرية والتراثية في المتاحف</title>
-    <style>
-        body {
-            font-family: 'Tahoma', sans-serif;
-            background-color: #f8f9fa;
-            color: #343a40;
-            margin: 20px;
-            direction: rtl;
-        }
-        h1 {
-            text-align: center;
-            color: #0056b3;
-            margin-bottom: 20px;
-        }
-        form {
-            max-width: 800px;
-            margin: auto;
-            padding: 20px;
-            background-color: #ffffff;
-            border-radius: 8px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        label {
-            color: #495057;
-            font-weight: bold;
-        }
-        input, textarea, select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-        }
-        textarea {
-            resize: vertical;
-        }
-        input:focus, textarea:focus, select:focus {
-            border-color: #0056b3;
-            outline: none;
-        }
-        .full-width {
-            grid-column: span 2;
-        }
-        .image-preview {
-            grid-column: span 2;
-            text-align: center;
-        }
-        img {
-            max-width: 100%;
-            height: auto;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            margin-top: 10px;
-        }
-        button {
-            grid-column: span 2;
-            padding: 10px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-        #status-message {
-            text-align: center;
-            margin-top: 20px;
-            padding: 10px;
-            border-radius: 4px;
-        }
-        .success {
-            background-color: #d4edda;
-            color: #155724;
-        }
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
-        }
-        .folder-info {
-            grid-column: span 2;
-            text-align: center;
-            padding: 10px;
-            background-color: #e2e3e5;
-            border-radius: 4px;
-        }
-        .index-btn-container {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .index-btn {
-            padding: 10px 20px;
-            background-color: #6c757d;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .index-btn:hover {
-            background-color: #5a6268;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نظام توثيق القطع الأثرية</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #2c786c;
+      --secondary-color: #004445;
+      --accent-color: #f8b400;
+      --light-color: #faf5e4;
+      --dark-color: #333;
+      --error-color: #e74c3c;
+      --success-color: #2ecc71;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background-color: #f5f5f5;
+      color: var(--dark-color);
+      line-height: 1.6;
+      direction: rtl;
+      padding: 0;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    header {
+      background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+      color: white;
+      padding: 25px 0;
+      text-align: center;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    header h1 {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+    
+    header p {
+      opacity: 0.9;
+      font-size: 16px;
+    }
+    
+    .index-btn-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    
+    .index-btn {
+      padding: 12px 25px;
+      background-color: #6c757d;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      font-family: 'Tajawal', sans-serif;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s;
+    }
+    
+    .index-btn:hover {
+      background-color: #5a6268;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .main-container {
+      display: flex;
+      gap: 25px;
+      flex-wrap: wrap;
+      margin-bottom: 30px;
+    }
+    
+    .form-section, .image-section {
+      background: white;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      flex: 1 1 450px;
+      min-width: 300px;
+    }
+    
+    .section-title {
+      color: var(--secondary-color);
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--light-color);
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .section-title i {
+      color: var(--primary-color);
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-row {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+    
+    .form-row .form-group {
+      flex: 1;
+      margin-bottom: 0;
+    }
+    
+    label {
+      font-weight: 500;
+      display: block;
+      margin-bottom: 8px;
+      color: var(--secondary-color);
+    }
+    
+    label.required:after {
+      content: " *";
+      color: var(--error-color);
+    }
+    
+    input[type="text"], 
+    input[type="date"], 
+    input[type="number"], 
+    input[type="file"], 
+    textarea, 
+    select {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 15px;
+      transition: all 0.3s;
+    }
+    
+    input:focus, 
+    textarea:focus, 
+    select:focus {
+      outline: none;
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 3px rgba(44, 120, 108, 0.1);
+    }
+    
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    
+    .large-textarea {
+      min-height: 150px;
+    }
+    
+    select {
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: left 15px center;
+      background-size: 16px;
+      padding-right: 15px;
+    }
+    
+    .image-preview {
+      width: 100%;
+      height: 320px;
+      border: 2px dashed #ddd;
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 20px;
+      overflow: hidden;
+      background-color: #f9f9f9;
+      position: relative;
+      transition: all 0.3s;
+    }
+    
+    .image-preview:hover {
+      border-color: var(--primary-color);
+    }
+    
+    .image-preview img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+    
+    .image-preview span {
+      color: #888;
+      font-size: 16px;
+    }
+    
+    .image-upload {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      font-family: 'Tajawal', sans-serif;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .btn-primary {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .btn-outline {
+      background-color: transparent;
+      color: var(--primary-color);
+      border: 1px solid var(--primary-color);
+    }
+    
+    .btn-outline:hover {
+      background-color: rgba(44, 120, 108, 0.1);
+    }
+    
+    .btn-block {
+      display: flex;
+      width: 100%;
+    }
+    
+    .optional-section {
+      margin-top: 30px;
+      background-color: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+    
+    .submit-section {
+      text-align: center;
+      margin-top: 30px;
+    }
+    
+    .submit-btn {
+      padding: 14px 30px;
+      font-size: 17px;
+      min-width: 200px;
+    }
+    
+    .dimensions-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    
+    .dimension-box {
+      background-color: var(--light-color);
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+    }
+    
+    .dimension-box label {
+      margin-bottom: 10px;
+      color: var(--primary-color);
+      font-weight: 600;
+    }
+    
+    .dimension-box input {
+      text-align: center;
+    }
+    
+    .form-note {
+      font-size: 14px;
+      color: #666;
+      margin-top: 5px;
+    }
+    
+    .designer-credit {
+      margin: 40px auto;
+      text-align: center;
+      padding: 25px;
+      color: var(--secondary-color);
+      font-size: 16px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      max-width: 600px;
+      position: relative;
+      overflow: hidden;
+      border-top: 3px solid var(--accent-color);
+    }
+    
+    .designer-credit a {
+      color: var(--primary-color);
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s;
+      display: inline-block;
+      padding: 0 5px;
+      position: relative;
+    }
+    
+    .designer-credit a:hover {
+      color: var(--accent-color);
+      transform: translateY(-2px);
+    }
+    
+    .designer-credit a::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 5px;
+      right: 5px;
+      height: 2px;
+      background: var(--accent-color);
+      transform: scaleX(0);
+      transition: transform 0.3s;
+    }
+    
+    .designer-credit a:hover::after {
+      transform: scaleX(1);
+    }
+    
+    .designer-title {
+      font-size: 18px;
+      margin-bottom: 10px;
+      color: var(--secondary-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .designer-title i {
+      color: var(--accent-color);
+    }
+    
+    .designer-badge {
+      display: inline-block;
+      background: var(--light-color);
+      padding: 8px 15px;
+      border-radius: 20px;
+      margin: 15px 0;
+      font-size: 14px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    
+    .social-links {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+    
+    .social-links a {
+      color: var(--secondary-color);
+      background: var(--light-color);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+    
+    .social-links a:hover {
+      background: var(--primary-color);
+      color: white;
+      transform: translateY(-3px);
+    }
+    
+    @media (max-width: 768px) {
+      .form-row {
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      .dimensions-container {
+        grid-template-columns: 1fr 1fr;
+      }
+      
+      header h1 {
+        font-size: 24px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .container {
+        padding: 15px;
+      }
+      
+      .form-section, .image-section {
+        padding: 20px;
+      }
+      
+      .dimensions-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .btn {
+        padding: 10px 15px;
+        font-size: 15px;
+      }
+      
+      .designer-credit {
+        padding: 20px 15px;
+      }
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .image-preview img {
+      animation: fadeIn 0.5s ease-in-out;
+    }
+  </style>
 </head>
 <body>
-    <h1>برنامج توثيق القطع الأثرية والتراثية في المتاحف</h1>
-    
-    <div class="index-btn-container">
-        <button class="index-btn" id="openIndexBtn">عرض فهرس القطع الأثرية</button>
+
+<div class="container">
+  <header>
+    <h1>نظام توثيق القطع الأثرية والتراثية</h1>
+    <p>نموذج شامل لتوثيق وحفظ المعلومات الأساسية للقطع المتحفية</p>
+  </header>
+
+  <div class="index-btn-container">
+    <button class="index-btn" id="openIndexBtn">
+      <i class="fas fa-list"></i> عرض فهرس القطع الأثرية
+    </button>
+  </div>
+
+  <form id="artifactForm">
+    <div class="main-container">
+      <div class="form-section">
+        <h2 class="section-title"><i class="fas fa-info-circle"></i> المعلومات الأساسية</h2>
+        
+        <div class="form-group">
+          <label class="required">اسم الفرع:</label>
+          <input type="text" id="branch" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="required">اسم المتحف:</label>
+          <input type="text" id="museum" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="required">نوع القطعة:</label>
+          <input type="text" id="artifact_type" required placeholder="مثال: تمثال، كأس، خاتم">
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label class="required">رقم القطعة:</label>
+            <input type="text" id="piece_number" required>
+          </div>
+          <div class="form-group">
+            <label>رقم السجل:</label>
+            <input type="text" id="record_number">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>مكان العثور:</label>
+          <input type="text" id="discovery_place" placeholder="المدينة/الموقع الأثري">
+        </div>
+        
+        <div class="form-group">
+          <label>مصدر القطعة:</label>
+          <select id="source" class="form-control">
+            <option value="">-- اختر المصدر --</option>
+            <option value="هدية">هدية</option>
+            <option value="شراء">شراء</option>
+            <option value="هبة">هبة</option>
+            <option value="إعارة">إعارة</option>
+            <option value="تنقيب">تنقيب</option>
+            <option value="أخرى">أخرى</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label>تاريخ الحيازة:</label>
+          <input type="date" id="acquisition_date">
+        </div>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>المادة:</label>
+            <input type="text" id="material" placeholder="مثل: خزف، برونز">
+          </div>
+          <div class="form-group">
+            <label>اللون:</label>
+            <input type="text" id="color">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>الفترة الزمنية:</label>
+          <input type="text" id="time_period" placeholder="مثل: العصر الإسلامي المبكر">
+        </div>
+        
+        <h3 class="section-title" style="margin-top: 30px; font-size: 18px;"><i class="fas fa-ruler-combined"></i> الأبعاد والقياسات</h3>
+        
+        <div class="dimensions-container">
+          <div class="dimension-box">
+            <label>الارتفاع (سم)</label>
+            <input type="number" id="height" step="0.01">
+          </div>
+          <div class="dimension-box">
+            <label>العرض (سم)</label>
+            <input type="number" id="width" step="0.01">
+          </div>
+          <div class="dimension-box">
+            <label>السمك (سم)</label>
+            <input type="number" id="length" step="0.01">
+          </div>
+          <div class="dimension-box">
+            <label>القطر (سم)</label>
+            <input type="number" id="diameter" step="0.01">
+          </div>
+          <div class="dimension-box">
+            <label>العمق (سم)</label>
+            <input type="number" id="depth" step="0.01">
+          </div>
+          <div class="dimension-box">
+            <label>الوزن (كجم)</label>
+            <input type="number" id="weight" step="0.01">
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>الحالة العامة للقطعة:</label>
+          <select id="condition">
+            <option value="">-- اختر الحالة --</option>
+            <option value="ممتازة">ممتازة</option>
+            <option value="جيدة">جيدة</option>
+            <option value="متوسطة">متوسطة</option>
+            <option value="سيئة">سيئة</option>
+            <option value="تحتاج ترميم">تحتاج ترميم</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="image-section">
+        <h2 class="section-title"><i class="fas fa-image"></i> الصورة والوصف</h2>
+        
+        <div class="image-preview" id="imagePreview">
+          <span><i class="fas fa-image" style="font-size: 40px; color: #ccc; margin-bottom: 10px;"></i><br>لم يتم اختيار صورة</span>
+        </div>
+        
+        <div class="image-upload">
+          <input type="file" id="imageUpload" accept="image/*" onchange="previewImage(event)" style="display:none;">
+          <button type="button" class="btn btn-primary" onclick="document.getElementById('imageUpload').click()">
+            <i class="fas fa-upload"></i> اختر صورة
+          </button>
+          <button type="button" class="btn btn-outline" onclick="clearImage()">
+            <i class="fas fa-trash-alt"></i> مسح
+          </button>
+        </div>
+        
+        <div class="form-group">
+          <label>الوصف التفصيلي:</label>
+          <textarea id="description" placeholder="وصف القطعة الأثرية، زخارفها، نقوشها، أي تفاصيل مميزة..."></textarea>
+          <p class="form-note">يرجى كتابة وصف شامل للقطعة يشمل جميع التفاصيل المهمة</p>
+        </div>
+        
+        <div class="form-group">
+          <label>النشر:</label>
+          <textarea id="published_by" class="large-textarea" placeholder="مثلاً: د. فلان في كتاب كذا، أو أي تفاصيل أخرى عن النشر..."></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label class="required">اسم الموثق:</label>
+          <input type="text" id="documenter" required>
+        </div>
+        
+        <div class="form-group">
+          <label class="required">تاريخ التوثيق:</label>
+          <input type="date" id="documentation_date" required>
+        </div>
+      </div>
     </div>
 
-    <form id="artifact-form">
-        <div class="folder-info" id="folder-info">
-            لم يتم اختيار مجلد الحفظ بعد
+    <div class="optional-section">
+      <h2 class="section-title"><i class="fas fa-info-circle"></i> معلومات إضافية (اختيارية)</h2>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>رقم الكتالوج:</label>
+          <input type="text" id="catalog_number">
         </div>
-
-        <div class="full-width">
-            <label for="museum-name">اسم المتحف:</label>
-            <input type="text" id="museum-name" name="museum-name" required>
+        <div class="form-group">
+          <label>رقم البطاقة:</label>
+          <input type="text" id="card_number">
         </div>
-
-        <label for="artifact-number">رقم القطعة:</label>
-        <input type="text" id="artifact-number" name="artifact-number" required>
-
-        <label for="artifact-type">نوع القطعة:</label>
-        <input type="text" id="artifact-type" name="artifact-type" required>
-
-        <label for="discovery-location">مكان العثور:</label>
-        <input type="text" id="discovery-location" name="discovery-location" required>
-
-        <label for="artifact-condition">حالة القطعة:</label>
-        <input type="text" id="artifact-condition" name="artifact-condition" required>
-
-        <label for="dimensions">المقاسات:</label>
-        <input type="text" id="dimensions" name="dimensions" required>
-
-        <label for="material">المادة:</label>
-        <input type="text" id="material" name="material" required>
-
-        <label for="color">اللون:</label>
-        <input type="text" id="color" name="color" required>
-
-        <label for="time-period">الفترة الزمنية:</label>
-        <input type="text" id="time-period" name="time-period" required>
-
-        <div class="full-width">
-            <label for="image">الصورة:</label>
-            <input type="file" id="image" name="image" accept="image/*" onchange="previewImage(event)">
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>رقم الدليل:</label>
+          <input type="text" id="guide_number">
         </div>
-
-        <div class="image-preview">
-            <label>عرض الصورة:</label>
-            <img id="image-display" src="#" alt="لا توجد صورة مرفوعة">
+        <div class="form-group">
+          <label>رقم سابق:</label>
+          <input type="text" id="previous_number">
         </div>
-
-        <div class="full-width">
-            <label for="description">الوصف:</label>
-            <textarea id="description" name="description" rows="4" required></textarea>
+      </div>
+      
+      <h3 class="section-title" style="margin-top: 30px; font-size: 18px;"><i class="fas fa-map-marker-alt"></i> معلومات الموقع</h3>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>مكان الحفظ الحالي:</label>
+          <input type="text" id="storage_location">
         </div>
-
-        <div class="full-width">
-            <label for="publication">النشر:</label>
-            <textarea id="publication" name="publication" rows="4"></textarea>
+        <div class="form-group">
+          <label>الغرفة/القاعة:</label>
+          <input type="text" id="room">
         </div>
+      </div>
+      
+      <div class="form-row">
+        <div class="form-group">
+          <label>الخزنة/العرض:</label>
+          <input type="text" id="safe">
+        </div>
+        <div class="form-group">
+          <label>المخزن:</label>
+          <input type="text" id="storage">
+        </div>
+      </div>
+      
+      <div class="form-group">
+        <label>الرف/الوحدة:</label>
+        <input type="text" id="shelf">
+      </div>
+      
+      <div class="form-group">
+        <label>المكان السابق للحفظ (إن وجد):</label>
+        <input type="text" id="previous_location">
+      </div>
+    </div>
 
-        <label for="documentation-date">تاريخ التوثيق:</label>
-        <input type="date" id="documentation-date" name="documentation-date" required>
+    <div class="submit-section">
+      <button type="button" class="btn btn-primary submit-btn" id="saveBtn">
+        <i class="fas fa-save"></i> حفظ البيانات
+      </button>
+    </div>
+  </form>
 
-        <button type="button" onclick="selectFolderAndSave()">اختيار مجلد الحفظ وحفظ القطعة</button>
-    </form>
+  <div class="designer-credit">
+    <div class="designer-title">
+      <i class="fas fa-palette"></i>
+      <span>تصميم وإشراف</span>
+    </div>
+    
+    <a href="https://reach.link/salahalhusaini" target="_blank">
+      د. صلاح الحسيني
+    </a>
+    
+    <div class="designer-badge">
+      خبير الآثار والتراث الثقافي
+    </div>
+  </div>
+</div>
 
-    <div id="status-message" style="display: none;"></div>
+<script>
+  // متغيرات لتخزين مقابض المجلدات
+  let artifactsFolderHandle;
+  let uploadsFolderHandle;
+  let baseFolderHandle;
 
-    <script>
-        // تعيين التاريخ الحالي لحقل تاريخ التوثيق
-        const dateField = document.getElementById('documentation-date');
-        const today = new Date().toISOString().split('T')[0];
-        dateField.value = today;
+  // معاينة الصورة
+  function previewImage(event) {
+    const imagePreview = document.getElementById('imagePreview');
+    const file = event.target.files[0];
+    
+    if (file) {
+      const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+      if (!validTypes.includes(file.type)) {
+        alert('الرجاء اختيار صورة بصيغة JPEG أو PNG أو GIF');
+        event.target.value = '';
+        return;
+      }
+      
+      if (file.size > 2 * 1024 * 1024) {
+        alert('حجم الصورة يجب أن يكون أقل من 2MB');
+        event.target.value = '';
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        imagePreview.innerHTML = `<img src="${e.target.result}" alt="معاينة الصورة">`;
+      }
+      reader.readAsDataURL(file);
+    }
+  }
+  
+  // مسح الصورة
+  function clearImage() {
+    document.getElementById('imagePreview').innerHTML = `
+      <span><i class="fas fa-image" style="font-size: 40px; color: #ccc; margin-bottom: 10px;"></i><br>لم يتم اختيار صورة</span>
+    `;
+    document.getElementById('imageUpload').value = '';
+  }
+  
+  // تعبئة تاريخ اليوم تلقائيًا
+  window.onload = function() {
+    const today = new Date();
+    const formattedDate = today.toISOString().substr(0, 10);
+    document.getElementById('documentation_date').value = formattedDate;
+  };
+  
+  // دالة لاختيار المجلد الأساسي
+  async function selectBaseFolder() {
+    try {
+      const dirHandle = await window.showDirectoryPicker();
+      baseFolderHandle = dirHandle;
+      
+      artifactsFolderHandle = await dirHandle.getDirectoryHandle('artifacts', { create: true });
+      uploadsFolderHandle = await dirHandle.getDirectoryHandle('uploads', { create: true });
+      
+      return true;
+    } catch (error) {
+      console.error('Error selecting folder:', error);
+      alert('لم يتم اختيار مجلد الحفظ');
+      return false;
+    }
+  }
 
-        // متغيرات لتخزين مقبض المجلد
-        let artifactsFolderHandle;
-        let uploadsFolderHandle;
-        let baseFolderHandle;
+  // دالة لحفظ القطعة الأثرية
+  async function saveArtifact() {
+    const pieceNumber = document.getElementById('piece_number').value;
+    
+    if (!pieceNumber) {
+      alert('يرجى إدخال رقم القطعة');
+      return;
+    }
 
-        // عرض الصورة المرفوعة
-        function previewImage(event) {
-            const imageDisplay = document.getElementById('image-display');
-            const file = event.target.files[0];
-            if (file) {
-                imageDisplay.src = URL.createObjectURL(file);
-                imageDisplay.alt = "الصورة المرفوعة";
-            }
-        }
+    if (!baseFolderHandle) {
+      const folderSelected = await selectBaseFolder();
+      if (!folderSelected) return;
+    }
 
-        // دالة لاختيار المجلد الأساسي
-        async function selectBaseFolder() {
-            try {
-                const dirHandle = await window.showDirectoryPicker();
-                baseFolderHandle = dirHandle;
-                
-                // إنشاء مجلد artifacts إذا لم يكن موجوداً
-                artifactsFolderHandle = await dirHandle.getDirectoryHandle('artifacts', { create: true });
-                
-                // إنشاء مجلد uploads إذا لم يكن موجوداً
-                uploadsFolderHandle = await dirHandle.getDirectoryHandle('uploads', { create: true });
-                
-                document.getElementById('folder-info').textContent = `سيتم الحفظ في: ${dirHandle.name}/artifacts/ و ${dirHandle.name}/uploads/`;
-                showStatusMessage('تم اختيار مجلد الحفظ بنجاح', 'success');
-                return true;
-            } catch (error) {
-                showStatusMessage('لم يتم اختيار مجلد الحفظ', 'error');
-                return false;
-            }
-        }
-
-        // دالة مختصرة لاختيار المجلد ثم الحفظ
-        async function selectFolderAndSave() {
-            if (!baseFolderHandle) {
-                const folderSelected = await selectBaseFolder();
-                if (!folderSelected) return;
-            }
-            await saveArtifact();
-        }
-
-        // دالة لحفظ القطعة الأثرية
-        async function saveArtifact() {
-            const form = document.getElementById('artifact-form');
-            const formData = new FormData(form);
-            const artifactNumber = document.getElementById('artifact-number').value;
-            
-            if (!artifactNumber) {
-                showStatusMessage('يرجى إدخال رقم القطعة', 'error');
-                return;
-            }
-
-            // إنشاء محتوى HTML للقطعة الأثرية
-            let htmlContent = `<!DOCTYPE html>
-<html lang="ar">
+    // إنشاء محتوى HTML للقطعة الأثرية
+    let htmlContent = `<!DOCTYPE html>
+<html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${formData.get('artifact-number')} - ${formData.get('artifact-type')}</title>
-    <style>
-        body {
-            font-family: 'Tahoma', sans-serif;
-            background-color: #f8f9fa;
-            color: #343a40;
-            margin: 20px;
-            direction: rtl;
-        }
-        h1 {
-            color: #0056b3;
-            text-align: center;
-        }
-        .artifact-info {
-            background-color: #ffffff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-            max-width: 800px;
-            margin: 20px auto;
-        }
-        .info-row {
-            display: flex;
-            margin-bottom: 10px;
-        }
-        .info-label {
-            font-weight: bold;
-            width: 150px;
-            color: #495057;
-        }
-        .info-value {
-            flex: 1;
-        }
-        .artifact-image {
-            max-width: 100%;
-            height: auto;
-            display: block;
-            margin: 20px auto;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>${document.getElementById('piece_number').value} - ${document.getElementById('artifact_type').value}</title>
+  <style>
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background-color: #f5f5f5;
+      color: #333;
+      line-height: 1.6;
+      direction: rtl;
+      padding: 20px;
+    }
+    .artifact-container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+    h1 {
+      color: #2c786c;
+      text-align: center;
+      margin-bottom: 20px;
+      border-bottom: 2px solid #faf5e4;
+      padding-bottom: 10px;
+    }
+    .info-row {
+      display: flex;
+      margin-bottom: 15px;
+    }
+    .info-label {
+      font-weight: bold;
+      width: 150px;
+      color: #004445;
+    }
+    .info-value {
+      flex: 1;
+    }
+    .artifact-image {
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin: 20px auto;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+  </style>
 </head>
 <body>
-    <h1>${formData.get('artifact-type')} - ${formData.get('artifact-number')}</h1>
+  <div class="artifact-container">
+    <h1>${document.getElementById('artifact_type').value} - ${document.getElementById('piece_number').value}</h1>
     
-    <div class="artifact-info">
-        <div class="info-row">
-            <div class="info-label">اسم المتحف:</div>
-            <div class="info-value">${formData.get('museum-name')}</div>
-        </div>
-        <div class="info-row">
-            <div class="info-label">رقم القطعة:</div>
-            <div class="info-value">${formData.get('artifact-number')}</div>
-        </div>
-        <div class="info-row">
-            <div class="info-label">نوع القطعة:</div>
-            <div class="info-value">${formData.get('artifact-type')}</div>
-        </div>
-        <div class="info-row">
-            <div class="info-label">مكان العثور:</div>
-            <div class="info-value">${formData.get('discovery-location')}</div>
-        </div>
-        <div class="info-row">
-            <div class="info-label">حالة القطعة:</div>
-            <div class="info-value">${formData.get('artifact-condition')}</div>
-        </div>
-        <div class="info-row">
-            <div class="info-label">المقاسات:</div>
-            <div class="info-value">${formData.get('dimensions')}</div>
-        </div>
-        <div class="info-row">
-            <div class="info-label">المادة:</div>
-            <div class="info-value">${formData.get('material')}</div>
-        </div>
-        <div class="info-row">
-            <div class="info-label">اللون:</div>
-            <div class="info-value">${formData.get('color')}</div>
-        </div>
-        <div class="info-row">
-            <div class="info-label">الفترة الزمنية:</div>
-            <div class="info-value">${formData.get('time-period')}</div>
-        </div>
-        <div class="info-row">
-            <div class="info-label">الوصف:</div>
-            <div class="info-value">${formData.get('description')}</div>
-        </div>
-        <div class="info-row">
-            <div class="info-label">النشر:</div>
-            <div class="info-value">${formData.get('publication')}</div>
-        </div>
-        <div class="info-row">
-            <div class="info-label">تاريخ التوثيق:</div>
-            <div class="info-value">${formData.get('documentation-date')}</div>
-        </div>`;
+    <div class="info-row">
+      <div class="info-label">اسم الفرع:</div>
+      <div class="info-value">${document.getElementById('branch').value}</div>
+    </div>
+    
+    <div class="info-row">
+      <div class="info-label">اسم المتحف:</div>
+      <div class="info-value">${document.getElementById('museum').value}</div>
+    </div>
+    
+    <div class="info-row">
+      <div class="info-label">نوع القطعة:</div>
+      <div class="info-value">${document.getElementById('artifact_type').value}</div>
+    </div>
+    
+    <div class="info-row">
+      <div class="info-label">رقم القطعة:</div>
+      <div class="info-value">${document.getElementById('piece_number').value}</div>
+    </div>`;
 
-            // معالجة الصورة إذا وجدت
-            const imageInput = document.getElementById('image');
-            let imageFileName = '';
+    // إضافة الحقول الأخرى
+    if (document.getElementById('record_number').value) {
+      htmlContent += `
+    <div class="info-row">
+      <div class="info-label">رقم السجل:</div>
+      <div class="info-value">${document.getElementById('record_number').value}</div>
+    </div>`;
+    }
 
-            if (imageInput.files && imageInput.files[0]) {
-                const fileExtension = imageInput.files[0].name.split('.').pop();
-                imageFileName = `${artifactNumber}.${fileExtension}`;
-                
-                try {
-                    // حفظ الصورة في مجلد uploads
-                    const imageFileHandle = await uploadsFolderHandle.getFileHandle(imageFileName, { create: true });
-                    const writable = await imageFileHandle.createWritable();
-                    await writable.write(await imageInput.files[0].arrayBuffer());
-                    await writable.close();
-                    
-                    // إضافة مسار الصورة لمحتوى HTML
-                    htmlContent += `
-        <div class="info-row">
-            <div class="info-label">الصورة:</div>
-            <div class="info-value">
-                <img src="../uploads/${imageFileName}" alt="صورة القطعة" class="artifact-image">
-            </div>
-        </div>`;
-                } catch (error) {
-                    console.error('Error saving image:', error);
-                    showStatusMessage('حدث خطأ أثناء حفظ الصورة', 'error');
-                }
-            }
+    if (document.getElementById('discovery_place').value) {
+      htmlContent += `
+    <div class="info-row">
+      <div class="info-label">مكان العثور:</div>
+      <div class="info-value">${document.getElementById('discovery_place').value}</div>
+    </div>`;
+    }
 
-            htmlContent += `</div></body></html>`;
-            
-            try {
-                // حفظ ملف HTML في مجلد artifacts
-                const htmlFileHandle = await artifactsFolderHandle.getFileHandle(`${artifactNumber}.html`, { create: true });
-                const writable = await htmlFileHandle.createWritable();
-                await writable.write(htmlContent);
-                await writable.close();
-                
-                showStatusMessage(`تم حفظ القطعة رقم ${artifactNumber} بنجاح في المجلدات المحددة`, 'success');
-                document.getElementById('artifact-form').reset();
-                document.getElementById('image-display').src = '#';
-                document.getElementById('image-display').alt = 'لا توجد صورة مرفوعة';
-                dateField.value = today;
-            } catch (error) {
-                console.error('Error saving HTML:', error);
-                showStatusMessage('حدث خطأ أثناء حفظ الملف', 'error');
-            }
+    // إضافة الصورة إذا وجدت
+    const imageInput = document.getElementById('imageUpload');
+    let imageFileName = '';
+
+    if (imageInput.files && imageInput.files[0]) {
+      const fileExtension = imageInput.files[0].name.split('.').pop();
+      imageFileName = `${pieceNumber}.${fileExtension}`;
+      
+      try {
+        const imageFileHandle = await uploadsFolderHandle.getFileHandle(imageFileName, { create: true });
+        const writable = await imageFileHandle.createWritable();
+        await writable.write(await imageInput.files[0].arrayBuffer());
+        await writable.close();
+        
+        htmlContent += `
+    <div class="info-row">
+      <div class="info-label">الصورة:</div>
+      <div class="info-value">
+        <img src="../uploads/${imageFileName}" alt="صورة القطعة" class="artifact-image">
+      </div>
+    </div>`;
+      } catch (error) {
+        console.error('Error saving image:', error);
+        alert('حدث خطأ أثناء حفظ الصورة');
+      }
+    }
+
+    // إضافة الوصف والنشر
+    htmlContent += `
+    <div class="info-row">
+      <div class="info-label">الوصف:</div>
+      <div class="info-value">${document.getElementById('description').value || 'غير متوفر'}</div>
+    </div>
+    
+    <div class="info-row">
+      <div class="info-label">النشر:</div>
+      <div class="info-value">${document.getElementById('published_by').value || 'غير متوفر'}</div>
+    </div>
+    
+    <div class="info-row">
+      <div class="info-label">اسم الموثق:</div>
+      <div class="info-value">${document.getElementById('documenter').value}</div>
+    </div>
+    
+    <div class="info-row">
+      <div class="info-label">تاريخ التوثيق:</div>
+      <div class="info-value">${document.getElementById('documentation_date').value}</div>
+    </div>
+  </div>
+</body>
+</html>`;
+    
+    try {
+      const htmlFileHandle = await artifactsFolderHandle.getFileHandle(`${pieceNumber}.html`, { create: true });
+      const writable = await htmlFileHandle.createWritable();
+      await writable.write(htmlContent);
+      await writable.close();
+      
+      alert(`تم حفظ القطعة رقم ${pieceNumber} بنجاح`);
+      document.getElementById('artifactForm').reset();
+      document.getElementById('imagePreview').innerHTML = `
+        <span><i class="fas fa-image" style="font-size: 40px; color: #ccc; margin-bottom: 10px;"></i><br>لم يتم اختيار صورة</span>
+      `;
+      document.getElementById('documentation_date').value = new Date().toISOString().substr(0, 10);
+    } catch (error) {
+      console.error('Error saving HTML:', error);
+      alert('حدث خطأ أثناء حفظ الملف');
+    }
+  }
+
+  // دالة لفتح فهرس القطع الأثرية
+  async function openArtifactsIndex() {
+    try {
+      if (baseFolderHandle) {
+        try {
+          const fileHandle = await baseFolderHandle.getFileHandle('artifacts_index.html');
+          const file = await fileHandle.getFile();
+          const url = URL.createObjectURL(file);
+          window.open(url, '_blank');
+          return;
+        } catch (e) {
+          console.log('لم يتم العثور على الفهرس في المجلد المحدد');
         }
+      }
+      
+      window.open('artifacts_index.html', '_blank');
+    } catch (error) {
+      console.error('حدث خطأ أثناء محاولة فتح الفهرس:', error);
+      window.open('artifacts_index.html', '_blank');
+    }
+  }
 
-        // دالة لعرض رسائل الحالة
-        function showStatusMessage(message, type) {
-            const statusElement = document.getElementById('status-message');
-            statusElement.textContent = message;
-            statusElement.className = type;
-            statusElement.style.display = 'block';
-            
-            setTimeout(() => {
-                statusElement.style.display = 'none';
-            }, 5000);
-        }
+  // إضافة مستمع الأحداث
+  document.getElementById('openIndexBtn').addEventListener('click', openArtifactsIndex);
+  document.getElementById('saveBtn').addEventListener('click', saveArtifact);
 
-        // دالة لفتح فهرس القطع الأثرية
-        async function openArtifactsIndex() {
-            try {
-                if (baseFolderHandle) {
-                    // حاول فتح الفهرس من المجلد المحدد
-                    try {
-                        const fileHandle = await baseFolderHandle.getFileHandle('artifacts_index.html');
-                        const file = await fileHandle.getFile();
-                        const url = URL.createObjectURL(file);
-                        window.open(url, '_blank');
-                        return;
-                    } catch (e) {
-                        console.log('لم يتم العثور على الفهرس في المجلد المحدد');
-                    }
-                }
-                
-                // فتح الفهرس العام إذا لم يكن في المجلد المحدد
-                window.open('artifacts_index.html', '_blank');
-            } catch (error) {
-                console.error('حدث خطأ أثناء محاولة فتح الفهرس:', error);
-                window.open('artifacts_index.html', '_blank');
-            }
-        }
+  // التحقق من الحقول المطلوبة
+  document.getElementById('artifactForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const requiredFields = document.querySelectorAll('[required]');
+    let isValid = true;
+    
+    requiredFields.forEach(field => {
+      if (!field.value.trim()) {
+        field.style.borderColor = 'var(--error-color)';
+        isValid = false;
+      } else {
+        field.style.borderColor = '';
+      }
+    });
+    
+    if (!isValid) {
+      alert('الرجاء ملء جميع الحقول المطلوبة');
+    } else {
+      saveArtifact();
+    }
+  });
+</script>
 
-        // إضافة مستمع الأحداث للزر الجديد
-        document.getElementById('openIndexBtn').addEventListener('click', openArtifactsIndex);
-    </script>
 </body>
 </html>
