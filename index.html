@@ -526,7 +526,7 @@
         </div>
         
         <div class="image-upload">
-          <input type="file" id="imageUpload" accept="image/*" onchange="previewImage(event)" style="display:none;">
+          <input type="file" id="imageUpload" accept="image/*" style="display:none;">
           <button type="button" class="btn btn-primary" onclick="document.getElementById('imageUpload').click()">
             <i class="fas fa-upload"></i> اختر صورة
           </button>
@@ -648,7 +648,7 @@
   let baseFolderHandle;
 
   // معاينة الصورة
-  function previewImage(event) {
+  document.getElementById('imageUpload').addEventListener('change', function(event) {
     const imagePreview = document.getElementById('imagePreview');
     const file = event.target.files[0];
     
@@ -672,7 +672,7 @@
       }
       reader.readAsDataURL(file);
     }
-  }
+  });
   
   // مسح الصورة
   function clearImage() {
@@ -692,16 +692,33 @@
   // دالة لاختيار المجلد الأساسي
   async function selectBaseFolder() {
     try {
-      const dirHandle = await window.showDirectoryPicker();
+      // طلب إذن من المستخدم لاختيار المجلد
+      const dirHandle = await window.showDirectoryPicker({
+        mode: 'readwrite'
+      });
+      
       baseFolderHandle = dirHandle;
       
-      artifactsFolderHandle = await dirHandle.getDirectoryHandle('artifacts', { create: true });
-      uploadsFolderHandle = await dirHandle.getDirectoryHandle('uploads', { create: true });
+      // إنشاء مجلد artifacts إذا لم يكن موجودًا
+      try {
+        artifactsFolderHandle = await dirHandle.getDirectoryHandle('artifacts', { create: true });
+      } catch (error) {
+        console.error('Error creating artifacts folder:', error);
+        throw error;
+      }
+      
+      // إنشاء مجلد uploads إذا لم يكن موجودًا
+      try {
+        uploadsFolderHandle = await dirHandle.getDirectoryHandle('uploads', { create: true });
+      } catch (error) {
+        console.error('Error creating uploads folder:', error);
+        throw error;
+      }
       
       return true;
     } catch (error) {
       console.error('Error selecting folder:', error);
-      alert('لم يتم اختيار مجلد الحفظ');
+      alert('لم يتم اختيار مجلد الحفظ أو هناك مشكلة في الوصول إليه');
       return false;
     }
   }
@@ -715,13 +732,72 @@
       return;
     }
 
+    // التحقق من الحقول المطلوبة
+    const requiredFields = document.querySelectorAll('[required]');
+    let isValid = true;
+    
+    requiredFields.forEach(field => {
+      if (!field.value.trim()) {
+        field.style.borderColor = 'var(--error-color)';
+        isValid = false;
+      } else {
+        field.style.borderColor = '';
+      }
+    });
+    
+    if (!isValid) {
+      alert('الرجاء ملء جميع الحقول المطلوبة');
+      return;
+    }
+
+    // اختيار المجلد إذا لم يكن محددًا
     if (!baseFolderHandle) {
       const folderSelected = await selectBaseFolder();
       if (!folderSelected) return;
     }
 
-    // إنشاء محتوى HTML للقطعة الأثرية
-    let htmlContent = `<!DOCTYPE html>
+    try {
+      // إنشاء محتوى HTML للقطعة الأثرية
+      const htmlContent = generateArtifactHTML(pieceNumber);
+      
+      // حفظ ملف HTML
+      const htmlFileHandle = await artifactsFolderHandle.getFileHandle(`${pieceNumber}.html`, { create: true });
+      const writable = await htmlFileHandle.createWritable();
+      await writable.write(htmlContent);
+      await writable.close();
+      
+      // حفظ الصورة إذا وجدت
+      const imageInput = document.getElementById('imageUpload');
+      if (imageInput.files && imageInput.files[0]) {
+        const fileExtension = imageInput.files[0].name.split('.').pop();
+        const imageFileName = `${pieceNumber}.${fileExtension}`;
+        
+        const imageFileHandle = await uploadsFolderHandle.getFileHandle(imageFileName, { create: true });
+        const writable = await imageFileHandle.createWritable();
+        await writable.write(await imageInput.files[0].arrayBuffer());
+        await writable.close();
+      }
+      
+      alert(`تم حفظ القطعة رقم ${pieceNumber} بنجاح`);
+      resetForm();
+      
+    } catch (error) {
+      console.error('Error saving artifact:', error);
+      alert('حدث خطأ أثناء حفظ الملف: ' + error.message);
+    }
+  }
+
+  // دالة لإنشاء محتوى HTML للقطعة الأثرية
+  function generateArtifactHTML(pieceNumber) {
+    const imageInput = document.getElementById('imageUpload');
+    let imageFileName = '';
+    
+    if (imageInput.files && imageInput.files[0]) {
+      const fileExtension = imageInput.files[0].name.split('.').pop();
+      imageFileName = `${pieceNumber}.${fileExtension}`;
+    }
+    
+    return `<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
@@ -790,78 +866,46 @@
     <div class="info-row">
       <div class="info-label">رقم القطعة:</div>
       <div class="info-value">${document.getElementById('piece_number').value}</div>
-    </div>`;
-
-    // إضافة الحقول الأخرى
-    if (document.getElementById('record_number').value) {
-      htmlContent += `
+    </div>
+    
+    ${document.getElementById('record_number').value ? `
     <div class="info-row">
       <div class="info-label">رقم السجل:</div>
       <div class="info-value">${document.getElementById('record_number').value}</div>
-    </div>`;
-    }
-
-    if (document.getElementById('discovery_place').value) {
-      htmlContent += `
+    </div>` : ''}
+    
+    ${document.getElementById('discovery_place').value ? `
     <div class="info-row">
       <div class="info-label">مكان العثور:</div>
       <div class="info-value">${document.getElementById('discovery_place').value}</div>
-    </div>`;
-    }
-
-    if (document.getElementById('source').value) {
-      htmlContent += `
+    </div>` : ''}
+    
+    ${document.getElementById('source').value ? `
     <div class="info-row">
       <div class="info-label">مصدر القطعة:</div>
       <div class="info-value">${document.getElementById('source').value}</div>
-    </div>`;
-    }
-
-    if (document.getElementById('material').value) {
-      htmlContent += `
+    </div>` : ''}
+    
+    ${document.getElementById('material').value ? `
     <div class="info-row">
       <div class="info-label">المادة:</div>
       <div class="info-value">${document.getElementById('material').value}</div>
-    </div>`;
-    }
-
-    if (document.getElementById('dimensions').value) {
-      htmlContent += `
+    </div>` : ''}
+    
+    ${document.getElementById('dimensions').value ? `
     <div class="info-row">
       <div class="info-label">المقاسات:</div>
       <div class="info-value">${document.getElementById('dimensions').value}</div>
-    </div>`;
-    }
-
-    // إضافة الصورة إذا وجدت
-    const imageInput = document.getElementById('imageUpload');
-    let imageFileName = '';
-
-    if (imageInput.files && imageInput.files[0]) {
-      const fileExtension = imageInput.files[0].name.split('.').pop();
-      imageFileName = `${pieceNumber}.${fileExtension}`;
-      
-      try {
-        const imageFileHandle = await uploadsFolderHandle.getFileHandle(imageFileName, { create: true });
-        const writable = await imageFileHandle.createWritable();
-        await writable.write(await imageInput.files[0].arrayBuffer());
-        await writable.close();
-        
-        htmlContent += `
+    </div>` : ''}
+    
+    ${imageFileName ? `
     <div class="info-row">
       <div class="info-label">الصورة:</div>
       <div class="info-value">
         <img src="../uploads/${imageFileName}" alt="صورة القطعة" class="artifact-image">
       </div>
-    </div>`;
-      } catch (error) {
-        console.error('Error saving image:', error);
-        alert('حدث خطأ أثناء حفظ الصورة');
-      }
-    }
-
-    // إضافة الوصف والنشر
-    htmlContent += `
+    </div>` : ''}
+    
     <div class="info-row">
       <div class="info-label">الوصف:</div>
       <div class="info-value">${document.getElementById('description').value || 'غير متوفر'}</div>
@@ -884,77 +928,42 @@
   </div>
 </body>
 </html>`;
-    
+  }
+
+  // دالة لإعادة تعيين النموذج
+  function resetForm() {
+    document.getElementById('artifactForm').reset();
+    document.getElementById('imagePreview').innerHTML = `
+      <span><i class="fas fa-image" style="font-size: 40px; color: #ccc; margin-bottom: 10px;"></i><br>لم يتم اختيار صورة</span>
+    `;
+    document.getElementById('documentation_date').value = new Date().toISOString().substr(0, 10);
+  }
+
+  // دالة لفتح فهرس القطع الأثرية
+  async function openArtifactsIndex() {
     try {
-      const htmlFileHandle = await artifactsFolderHandle.getFileHandle(`${pieceNumber}.html`, { create: true });
-      const writable = await htmlFileHandle.createWritable();
-      await writable.write(htmlContent);
-      await writable.close();
+      if (baseFolderHandle) {
+        try {
+          const fileHandle = await baseFolderHandle.getFileHandle('artifacts_index.html');
+          const file = await fileHandle.getFile();
+          const url = URL.createObjectURL(file);
+          window.open(url, '_blank');
+          return;
+        } catch (e) {
+          console.log('لم يتم العثور على الفهرس في المجلد المحدد');
+        }
+      }
       
-      alert(`تم حفظ القطعة رقم ${pieceNumber} بنجاح`);
-      document.getElementById('artifactForm').reset();
-      document.getElementById('imagePreview').innerHTML = `
-        <span><i class="fas fa-image" style="font-size: 40px; color: #ccc; margin-bottom: 10px;"></i><br>لم يتم اختيار صورة</span>
-      `;
-      document.getElementById('documentation_date').value = new Date().toISOString().substr(0, 10);
+      window.open('artifacts_index.html', '_blank');
     } catch (error) {
-      console.error('Error saving HTML:', error);
-      alert('حدث خطأ أثناء حفظ الملف');
+      console.error('حدث خطأ أثناء محاولة فتح الفهرس:', error);
+      window.open('artifacts_index.html', '_blank');
     }
   }
 
-        // دالة لفتح فهرس القطع الأثرية
-        async function openArtifactsIndex() {
-            try {
-                if (baseFolderHandle) {
-                    // حاول فتح الفهرس من المجلد المحدد
-                    try {
-                        const fileHandle = await baseFolderHandle.getFileHandle('artifacts_index.html');
-                        const file = await fileHandle.getFile();
-                        const url = URL.createObjectURL(file);
-                        window.open(url, '_blank');
-                        return;
-                    } catch (e) {
-                        console.log('لم يتم العثور على الفهرس في المجلد المحدد');
-                    }
-                }
-                
-                // فتح الفهرس العام إذا لم يكن في المجلد المحدد
-                window.open('artifacts_index.html', '_blank');
-            } catch (error) {
-                console.error('حدث خطأ أثناء محاولة فتح الفهرس:', error);
-                window.open('artifacts_index.html', '_blank');
-            }
-        }
-
-        // إضافة مستمع الأحداث للزر الجديد
-        document.getElementById('openIndexBtn').addEventListener('click', openArtifactsIndex);
-    </script>
-</body>
-</html>
-
-  // التحقق من الحقول المطلوبة
-  document.getElementById('artifactForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const requiredFields = document.querySelectorAll('[required]');
-    let isValid = true;
-    
-    requiredFields.forEach(field => {
-      if (!field.value.trim()) {
-        field.style.borderColor = 'var(--error-color)';
-        isValid = false;
-      } else {
-        field.style.borderColor = '';
-      }
-    });
-    
-    if (!isValid) {
-      alert('الرجاء ملء جميع الحقول المطلوبة');
-    } else {
-      saveArtifact();
-    }
-  });
+  // إضافة مستمع الأحداث للأزرار
+  document.getElementById('saveBtn').addEventListener('click', saveArtifact);
+  document.getElementById('openIndexBtn').addEventListener('click', openArtifactsIndex);
 </script>
 
 </body>
