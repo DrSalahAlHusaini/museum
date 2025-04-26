@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>معرض القطع الأثرية</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #2c5f8b;
+      --secondary-color: #3a7ca5;
+      --accent-color: #4bb19d;
+      --light-color: #f8f9fa;
+      --dark-color: #343a40;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background-color: #f5f7fa;
+      color: var(--dark-color);
+      line-height: 1.6;
+      direction: rtl;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      flex: 1;
+    }
+    
+    h1 {
+      text-align: center;
+      color: var(--primary-color);
+      margin-bottom: 30px;
+      font-size: 32px;
+    }
+    
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 25px;
+      margin-top: 30px;
+    }
+    
+    .artifact-card {
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+      border: 1px solid #eee;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    
+    .artifact-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .artifact-image-container {
+      height: 200px;
+      overflow: hidden;
+    }
+    
+    .artifact-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s;
+    }
+    
+    .artifact-card:hover .artifact-image {
+      transform: scale(1.05);
+    }
+    
+    .artifact-info {
+      padding: 15px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .artifact-name {
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--dark-color);
+    }
+    
+    .artifact-link {
+      display: inline-block;
+      background-color: var(--accent-color);
+      color: white;
+      padding: 8px 15px;
+      border-radius: 5px;
+      text-align: center;
+      text-decoration: none;
+      margin-top: auto;
+      transition: background-color 0.3s;
+    }
+    
+    .artifact-link:hover {
+      background-color: #3aa58f;
+    }
+    
+    .folder-selector {
+      background-color: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      border: 2px dashed #ddd;
+    }
+    
+    .folder-selector label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    
+    button {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+    }
+    
+    button:hover {
+      background-color: var(--secondary-color);
+    }
+    
+    .status {
+      margin: 20px 0;
+      padding: 10px;
+      border-radius: 5px;
+      text-align: center;
+    }
+    
+    .success {
+      background-color: #e6f7ee;
+      color: #28a745;
+    }
+    
+    .error {
+      background-color: #fde8e8;
+      color: #dc3545;
+    }
+    
+    footer {
+      margin-top: 40px;
+      text-align: center;
+      font-size: 14px;
+      color: #777;
+      padding: 20px 0;
+      border-top: 1px solid #ddd;
+    }
+    footer i {
+      color: var(--accent-color);
+    }
+    
+    @media (max-width: 768px) {
+      .gallery-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1><i class="fas fa-images"></i> معرض القطع الأثرية</h1>
+    
+    <div class="folder-selector">
+      <label>مجلد الصور (uploads): <span id="uploadsStatus">لم يتم التحديد</span></label>
+      <button id="selectUploadsFolder"><i class="fas fa-folder-open"></i> اختيار مجلد الصور</button>
+    </div>
+    
+    <div class="folder-selector">
+      <label>مجلد الملفات (artifacts): <span id="artifactsStatus">لم يتم التحديد</span></label>
+      <button id="selectArtifactsFolder"><i class="fas fa-folder-open"></i> اختيار مجلد الملفات</button>
+    </div>
+    
+    <button id="generateGallery" style="display: none; margin: 20px auto;">
+      <i class="fas fa-cogs"></i> توليد المعرض
+    </button>
+    
+    <div id="status" class="status" style="display: none;"></div>
+    
+    <div class="gallery-grid" id="galleryGrid"></div>
+  </div>
+
+  <footer>
+    <p>جميع الحقوق محفوظة &copy; 2025 معرض القطع الأثرية</p>
+<div class="footer">
+      تصميم وإشراف
+      <a href="https://reach.link/salahalhusaini" target="_blank">د. صلاح الحسيني</a>
+      — خبير الآثار والتراث الثقافي
+    </div>
+  </div>
+
+  </footer>
+
+  <script>
+    let uploadsFolderHandle;
+    let artifactsFolderHandle;
+    
+    const selectUploadsBtn = document.getElementById('selectUploadsFolder');
+    const selectArtifactsBtn = document.getElementById('selectArtifactsFolder');
+    const generateGalleryBtn = document.getElementById('generateGallery');
+    const statusDiv = document.getElementById('status');
+    const galleryGrid = document.getElementById('galleryGrid');
+    const uploadsStatus = document.getElementById('uploadsStatus');
+    const artifactsStatus = document.getElementById('artifactsStatus');
+
+    // اختيار المجلدات
+    selectUploadsBtn.addEventListener('click', async () => {
+      try {
+        uploadsFolderHandle = await window.showDirectoryPicker();
+        uploadsStatus.textContent = uploadsFolderHandle.name;
+        uploadsStatus.style.color = 'green';
+        checkFolders();
+      } catch (error) {
+        showStatus('تم إلغاء اختيار المجلد', 'error');
+      }
+    });
+
+    selectArtifactsBtn.addEventListener('click', async () => {
+      try {
+        artifactsFolderHandle = await window.showDirectoryPicker();
+        artifactsStatus.textContent = artifactsFolderHandle.name;
+        artifactsStatus.style.color = 'green';
+        checkFolders();
+      } catch (error) {
+        showStatus('تم إلغاء اختيار المجلد', 'error');
+      }
+    });
+
+    // التحقق من اختيار المجلدات
+    function checkFolders() {
+      if (uploadsFolderHandle || artifactsFolderHandle) {
+        generateGalleryBtn.style.display = 'block';
+      }
+    }
+
+    // توليد المعرض
+    generateGalleryBtn.addEventListener('click', async () => {
+      try {
+        if (!uploadsFolderHandle) {
+          showStatus('الرجاء اختيار مجلد الصور أولاً', 'error');
+          return;
+        }
+
+        showStatus('جاري إنشاء المعرض...', '');
+
+        // قراءة ملفات الصور
+        const imageFiles = [];
+        for await (const entry of uploadsFolderHandle.values()) {
+          if (entry.kind === 'file') {
+            const file = await entry.getFile();
+            const ext = file.name.split('.').pop().toLowerCase();
+            if (['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext)) {
+              imageFiles.push(file);
+            }
+          }
+        }
+
+        if (imageFiles.length === 0) {
+          showStatus('لم يتم العثور على صور في المجلد المحدد', 'error');
+          return;
+        }
+
+        // قراءة ملفات HTML (إذا كان المجلد محدداً)
+        const htmlFiles = [];
+        if (artifactsFolderHandle) {
+          for await (const entry of artifactsFolderHandle.values()) {
+            if (entry.kind === 'file') {
+              const file = await entry.getFile();
+              if (file.name.endsWith('.html')) {
+                htmlFiles.push(file);
+              }
+            }
+          }
+        }
+
+        // إنشاء المعرض
+        galleryGrid.innerHTML = '';
+        
+        imageFiles.forEach(imageFile => {
+          const card = document.createElement('div');
+          card.className = 'artifact-card';
+          
+          const imageName = imageFile.name.split('.')[0];
+          const imageUrl = URL.createObjectURL(imageFile);
+          
+          // البحث عن ملف HTML مطابق
+          const matchingHtml = htmlFiles.find(htmlFile => 
+            htmlFile.name.split('.')[0] === imageName
+          );
+          
+          card.innerHTML = `
+            <div class="artifact-image-container">
+              <img src="${imageUrl}" alt="${imageName}" class="artifact-image">
+            </div>
+            <div class="artifact-info">
+              <h3 class="artifact-name">${imageName}</h3>
+              ${matchingHtml ? `
+                <a href="artifacts/${matchingHtml.name}" class="artifact-link" target="_blank">
+                  <i class="fas fa-file-alt"></i> عرض التفاصيل
+                </a>
+              ` : ''}
+            </div>
+          `;
+          
+          galleryGrid.appendChild(card);
+        });
+
+        showStatus(`تم عرض ${imageFiles.length} صورة بنجاح`, 'success');
+        
+      } catch (error) {
+        showStatus(`حدث خطأ: ${error.message}`, 'error');
+        console.error(error);
+      }
+    });
+
+    // عرض رسائل الحالة
+    function showStatus(message, type) {
+      statusDiv.style.display = 'block';
+      statusDiv.textContent = message;
+      statusDiv.className = `status ${type}`;
+    }
+
+  </script>
+</body>
+</html>
