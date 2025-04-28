@@ -112,10 +112,29 @@
       text-decoration: none;
       margin-top: auto;
       transition: background-color 0.3s;
+      margin-bottom: 5px;
     }
     
     .artifact-link:hover {
       background-color: #3aa58f;
+    }
+    
+    .edit-btn {
+      display: inline-block;
+      background-color: var(--primary-color);
+      color: white;
+      padding: 8px 15px;
+      border-radius: 5px;
+      text-align: center;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      border: none;
+      font-family: inherit;
+    }
+    
+    .edit-btn:hover {
+      background-color: var(--secondary-color);
     }
     
     .folder-selector {
@@ -181,6 +200,33 @@
         grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
       }
     }
+    
+    /* أنماط التحرير */
+    .editable {
+      border: 1px dashed #4bb19d;
+      padding: 5px;
+      margin: 5px 0;
+      min-height: 20px;
+      outline: none;
+    }
+    
+    .save-btn {
+      background-color: #28a745;
+      margin-top: 5px;
+    }
+    
+    .save-btn:hover {
+      background-color: #218838;
+    }
+    
+    .cancel-btn {
+      background-color: #dc3545;
+      margin-top: 5px;
+    }
+    
+    .cancel-btn:hover {
+      background-color: #c82333;
+    }
   </style>
 </head>
 <body>
@@ -215,20 +261,19 @@
     </div>
 
     <a href="https://reach.link/salahalhusaini" target="_blank">
-
           <i class="fas fa-user-tie"></i> د. صلاح الحسيني
     </a>
     <div class="designer-badge">
       <i class="fas fa-landmark"></i> خبير الآثار والتراث الثقافي
-
     </div>
   </div>
-
   </footer>
 
   <script>
     let uploadsFolderHandle;
     let artifactsFolderHandle;
+    let htmlFiles = [];
+    let htmlFileHandles = [];
     
     const selectUploadsBtn = document.getElementById('selectUploadsFolder');
     const selectArtifactsBtn = document.getElementById('selectArtifactsFolder');
@@ -296,13 +341,15 @@
         }
 
         // قراءة ملفات HTML (إذا كان المجلد محدداً)
-        const htmlFiles = [];
+        htmlFiles = [];
+        htmlFileHandles = [];
         if (artifactsFolderHandle) {
           for await (const entry of artifactsFolderHandle.values()) {
             if (entry.kind === 'file') {
               const file = await entry.getFile();
               if (file.name.endsWith('.html')) {
                 htmlFiles.push(file);
+                htmlFileHandles.push(entry);
               }
             }
           }
@@ -311,7 +358,7 @@
         // إنشاء المعرض
         galleryGrid.innerHTML = '';
         
-        imageFiles.forEach(imageFile => {
+        imageFiles.forEach((imageFile, index) => {
           const card = document.createElement('div');
           card.className = 'artifact-card';
           
@@ -319,9 +366,12 @@
           const imageUrl = URL.createObjectURL(imageFile);
           
           // البحث عن ملف HTML مطابق
-          const matchingHtml = htmlFiles.find(htmlFile => 
+          const matchingHtmlIndex = htmlFiles.findIndex(htmlFile => 
             htmlFile.name.split('.')[0] === imageName
           );
+          
+          const matchingHtml = matchingHtmlIndex !== -1 ? htmlFiles[matchingHtmlIndex] : null;
+          const matchingHtmlHandle = matchingHtmlIndex !== -1 ? htmlFileHandles[matchingHtmlIndex] : null;
           
           card.innerHTML = `
             <div class="artifact-image-container">
@@ -330,14 +380,31 @@
             <div class="artifact-info">
               <h3 class="artifact-name">${imageName}</h3>
               ${matchingHtml ? `
-                <a href="artifacts/${matchingHtml.name}" class="artifact-link" target="_blank">
-                  <i class="fas fa-file-alt"></i> عرض التفاصيل
-                </a>
+                <div class="artifact-actions">
+                  <a href="artifacts/${matchingHtml.name}" class="artifact-link" target="_blank">
+                    <i class="fas fa-file-alt"></i> عرض التفاصيل
+                  </a>
+                  <button class="edit-btn" data-index="${index}" data-handle-index="${matchingHtmlIndex}">
+                    <i class="fas fa-edit"></i> تحرير النص
+                  </button>
+                </div>
               ` : ''}
             </div>
           `;
           
           galleryGrid.appendChild(card);
+        });
+
+        // إضافة مستمعات الأحداث لأزرار التحرير
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+          btn.addEventListener('click', async (e) => {
+            const index = e.target.getAttribute('data-index') || 
+                         e.target.parentElement.getAttribute('data-index');
+            const handleIndex = e.target.getAttribute('data-handle-index') || 
+                              e.target.parentElement.getAttribute('data-handle-index');
+            
+            await editHtmlContent(htmlFiles[handleIndex], htmlFileHandles[handleIndex]);
+          });
         });
 
         showStatus(`تم عرض ${imageFiles.length} صورة بنجاح`, 'success');
@@ -348,13 +415,78 @@
       }
     });
 
+    // تحرير محتوى HTML
+    async function editHtmlContent(htmlFile, htmlFileHandle) {
+      try {
+        const content = await htmlFile.text();
+        
+        // إنشاء نافذة التحرير
+        const modal = document.createElement('div');
+        modal.style.position = 'fixed';
+        modal.style.top = '0';
+        modal.style.left = '0';
+        modal.style.width = '100%';
+        modal.style.height = '100%';
+        modal.style.backgroundColor = 'rgba(0,0,0,0.7)';
+        modal.style.display = 'flex';
+        modal.style.justifyContent = 'center';
+        modal.style.alignItems = 'center';
+        modal.style.zIndex = '1000';
+        
+        const editor = document.createElement('div');
+        editor.style.backgroundColor = 'white';
+        editor.style.padding = '20px';
+        editor.style.borderRadius = '10px';
+        editor.style.width = '80%';
+        editor.style.maxWidth = '800px';
+        editor.style.maxHeight = '80vh';
+        editor.style.overflow = 'auto';
+        
+        editor.innerHTML = `
+          <h3 style="text-align: center; margin-bottom: 20px;">تحرير محتوى الملف: ${htmlFile.name}</h3>
+          <div class="editable" contenteditable="true" id="htmlEditor">${content}</div>
+          <div style="display: flex; gap: 10px; margin-top: 15px;">
+            <button class="save-btn" id="saveHtml"><i class="fas fa-save"></i> حفظ</button>
+            <button class="cancel-btn" id="cancelEdit"><i class="fas fa-times"></i> إلغاء</button>
+          </div>
+        `;
+        
+        modal.appendChild(editor);
+        document.body.appendChild(modal);
+        
+        // التركيز على محرر النص
+        document.getElementById('htmlEditor').focus();
+        
+        // مستمعات الأحداث للأزرار
+        document.getElementById('saveHtml').addEventListener('click', async () => {
+          try {
+            const newContent = document.getElementById('htmlEditor').innerHTML;
+            const writable = await htmlFileHandle.createWritable();
+            await writable.write(newContent);
+            await writable.close();
+            
+            showStatus('تم حفظ التغييرات بنجاح', 'success');
+            modal.remove();
+          } catch (error) {
+            showStatus(`حدث خطأ أثناء الحفظ: ${error.message}`, 'error');
+          }
+        });
+        
+        document.getElementById('cancelEdit').addEventListener('click', () => {
+          modal.remove();
+        });
+        
+      } catch (error) {
+        showStatus(`حدث خطأ أثناء التحرير: ${error.message}`, 'error');
+      }
+    }
+
     // عرض رسائل الحالة
     function showStatus(message, type) {
       statusDiv.style.display = 'block';
       statusDiv.textContent = message;
       statusDiv.className = `status ${type}`;
     }
-
   </script>
 </body>
 </html>
