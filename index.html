@@ -50,6 +50,34 @@
       border-radius: 10px;
       margin-bottom: 30px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    .language-switcher {
+      position: absolute;
+      left: 20px;
+      top: 20px;
+    }
+
+    .lang-btn {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-family: 'Tajawal', sans-serif;
+      transition: all 0.3s;
+    }
+
+    .lang-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .lang-btn.active {
+      background: white;
+      color: var(--primary-color);
+      font-weight: bold;
     }
 
     header h1 {
@@ -383,6 +411,24 @@
       box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
 
+    /* Language-specific styles */
+    body[dir="rtl"] {
+      direction: rtl;
+      text-align: right;
+    }
+
+    body[dir="ltr"] {
+      direction: ltr;
+      text-align: left;
+      font-family: Arial, sans-serif;
+    }
+
+    body[dir="ltr"] select {
+      background-position: right 15px center;
+      padding-left: 15px;
+      padding-right: 40px;
+    }
+
     @media (max-width: 768px) {
       .form-row {
         flex-direction: column;
@@ -391,6 +437,13 @@
       header h1 { font-size: 24px; }
       .main-container { flex-direction: column; }
       .index-btn-container { flex-direction: column; }
+      .language-switcher {
+        position: static;
+        margin-bottom: 15px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+      }
     }
 
     @media (max-width: 480px) {
@@ -428,185 +481,189 @@
 
 <div class="container">
   <header>
-    <h1>نظام توثيق القطع الأثرية والتراثية في المتاحف</h1>
-    <p>نموذج شامل لتوثيق وحفظ المعلومات الأساسية للقطع المتحفية</p>
+    <div class="language-switcher">
+      <button class="lang-btn active" data-lang="ar">العربية</button>
+      <button class="lang-btn" data-lang="en">English</button>
+    </div>
+    <h1 data-i18n="system_title">نظام توثيق القطع الأثرية والتراثية في المتاحف</h1>
+    <p data-i18n="system_subtitle">نموذج شامل لتوثيق وحفظ المعلومات الأساسية للقطع المتحفية</p>
   </header>
 
   <div class="index-btn-container">
     <button class="index-btn" id="openIndexBtn">
-      <i class="fas fa-list"></i> عرض فهرس القطع الأثرية
+      <i class="fas fa-list"></i> <span data-i18n="view_index">عرض فهرس القطع الأثرية</span>
     </button>
     <button class="index-btn" id="openGalleryBtn">
-      <i class="fas fa-images"></i> عرض معرض الصور
+      <i class="fas fa-images"></i> <span data-i18n="view_gallery">عرض معرض الصور</span>
     </button>
   </div>
 
   <form id="artifactForm">
     <div class="main-container">
       <div class="form-section">
-        <h2 class="section-title"><i class="fas fa-info-circle"></i> المعلومات الأساسية</h2>
+        <h2 class="section-title"><i class="fas fa-info-circle"></i> <span data-i18n="basic_info">المعلومات الأساسية</span></h2>
         <div class="form-group">
-          <label class="required" for="museum">اسم المتحف:</label>
+          <label class="required" for="museum" data-i18n="museum_name">اسم المتحف:</label>
           <input type="text" id="museum" required>
         </div>
         <div class="form-group">
-          <label class="required" for="artifact_type">نوع القطعة:</label>
-          <input type="text" id="artifact_type" required placeholder="مثال: تمثال، كأس، خاتم">
+          <label class="required" for="artifact_type" data-i18n="artifact_type">نوع القطعة:</label>
+          <input type="text" id="artifact_type" required data-i18n-placeholder="artifact_type_placeholder" placeholder="مثال: تمثال، كأس، خاتم">
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label class="required" for="piece_number">رقم القطعة:</label>
+            <label class="required" for="piece_number" data-i18n="piece_number">رقم القطعة:</label>
             <input type="text" id="piece_number" required>
           </div>
           <div class="form-group">
-            <label for="record_number">رقم السجل:</label>
+            <label for="record_number" data-i18n="record_number">رقم السجل:</label>
             <input type="text" id="record_number">
           </div>
         </div>
         <div class="form-group">
-          <label for="discovery_place">مكان العثور:</label>
-          <input type="text" id="discovery_place" placeholder="المدينة/الموقع الأثري">
+          <label for="discovery_place" data-i18n="discovery_place">مكان العثور:</label>
+          <input type="text" id="discovery_place" data-i18n-placeholder="discovery_place_placeholder" placeholder="المدينة/الموقع الأثري">
         </div>
         <div class="form-group">
-          <label for="source">مصدر القطعة:</label>
+          <label for="source" data-i18n="source">مصدر القطعة:</label>
           <select id="source">
-            <option value="">-- اختر المصدر --</option>
-            <option value="هدية">هدية</option>
-            <option value="شراء">شراء</option>
-            <option value="هبة">هبة</option>
-            <option value="إعارة">إعارة</option>
-            <option value="تنقيب">تنقيب</option>
-            <option value="مجهول">مجهول</option>
-            <option value="أخرى">أخرى</option>
+            <option value="" data-i18n="select_source">-- اختر المصدر --</option>
+            <option value="هدية" data-i18n="gift">هدية</option>
+            <option value="شراء" data-i18n="purchase">شراء</option>
+            <option value="هبة" data-i18n="donation">هبة</option>
+            <option value="إعارة" data-i18n="loan">إعارة</option>
+            <option value="تنقيب" data-i18n="excavation">تنقيب</option>
+            <option value="مجهول" data-i18n="unknown">مجهول</option>
+            <option value="أخرى" data-i18n="other">أخرى</option>
           </select>
         </div>
         <div class="form-group">
-          <label for="acquisition_date">تاريخ الحيازة:</label>
+          <label for="acquisition_date" data-i18n="acquisition_date">تاريخ الحيازة:</label>
           <input type="date" id="acquisition_date">
         </div>
         <div class="form-row">
           <div class="form-group">
-            <label for="material">المادة:</label>
-            <input type="text" id="material" placeholder="مثل: خزف، برونز، فخار، حجر">
+            <label for="material" data-i18n="material">المادة:</label>
+            <input type="text" id="material" data-i18n-placeholder="material_placeholder" placeholder="مثل: خزف، برونز، فخار، حجر">
           </div>
           <div class="form-group">
-            <label for="color">اللون:</label>
+            <label for="color" data-i18n="color">اللون:</label>
             <input type="text" id="color">
           </div>
         </div>
         <div class="form-group">
-          <label for="dimensions">المقاسات:</label>
-          <textarea id="dimensions" placeholder="أدخل جميع المقاسات المراد توثيقها"></textarea>
+          <label for="dimensions" data-i18n="dimensions">المقاسات:</label>
+          <textarea id="dimensions" data-i18n-placeholder="dimensions_placeholder" placeholder="أدخل جميع المقاسات المراد توثيقها"></textarea>
         </div>
         <div class="form-group">
-          <label for="time_period">الفترة الزمنية:</label>
-          <input type="text" id="time_period" placeholder="مثل: القرن الأول الميلادي، العصر الحجري الحديث">
+          <label for="time_period" data-i18n="time_period">الفترة الزمنية:</label>
+          <input type="text" id="time_period" data-i18n-placeholder="time_period_placeholder" placeholder="مثل: القرن الأول الميلادي، العصر الحجري الحديث">
         </div>
         <div class="form-group">
-          <label for="condition">الحالة العامة للقطعة:</label>
+          <label for="condition" data-i18n="condition">الحالة العامة للقطعة:</label>
           <select id="condition">
-            <option value="">-- اختر الحالة --</option>
-            <option value="ممتازة">ممتازة</option>
-            <option value="جيدة">جيدة</option>
-            <option value="متوسطة">متوسطة</option>
-            <option value="سيئة">سيئة</option>
-            <option value="تحتاج ترميم">تحتاج ترميم</option>
+            <option value="" data-i18n="select_condition">-- اختر الحالة --</option>
+            <option value="ممتازة" data-i18n="excellent">ممتازة</option>
+            <option value="جيدة" data-i18n="good">جيدة</option>
+            <option value="متوسطة" data-i18n="average">متوسطة</option>
+            <option value="سيئة" data-i18n="poor">سيئة</option>
+            <option value="تحتاج ترميم" data-i18n="needs_restoration">تحتاج ترميم</option>
           </select>
         </div>
       </div>
 
       <div class="image-section">
-        <h2 class="section-title"><i class="fas fa-image"></i> الصورة والوصف</h2>
+        <h2 class="section-title"><i class="fas fa-image"></i> <span data-i18n="image_description">الصورة والوصف</span></h2>
         <div class="image-preview required" id="imagePreview">
            <i class="fas fa-image"></i>
-           <span>لم يتم اختيار صورة</span>
+           <span data-i18n="no_image_selected">لم يتم اختيار صورة</span>
         </div>
-        <p class="image-required-note">* الصورة مطلوبة</p>
+        <p class="image-required-note" data-i18n="image_required">* الصورة مطلوبة</p>
         <div class="image-upload">
           <input type="file" id="imageUpload" accept="image/*" style="display:none;" required>
           <button type="button" class="btn btn-primary" onclick="document.getElementById('imageUpload').click()">
-            <i class="fas fa-upload"></i> اختر صورة
+            <i class="fas fa-upload"></i> <span data-i18n="choose_image">اختر صورة</span>
           </button>
           <button type="button" class="btn btn-outline" onclick="clearImage()">
-            <i class="fas fa-trash-alt"></i> مسح
+            <i class="fas fa-trash-alt"></i> <span data-i18n="clear">مسح</span>
           </button>
         </div>
         <div class="form-group">
-          <label for="description">الوصف التفصيلي:</label>
-          <textarea id="description" placeholder="وصف القطعة الأثرية، زخارفها، نقوشها، أي تفاصيل مميزة..."></textarea>
-          <p class="form-note">يرجى كتابة وصف شامل للقطعة يشمل جميع التفاصيل المهمة</p>
+          <label for="description" data-i18n="description">الوصف التفصيلي:</label>
+          <textarea id="description" data-i18n-placeholder="description_placeholder" placeholder="وصف القطعة الأثرية، زخارفها، نقوشها، أي تفاصيل مميزة..."></textarea>
+          <p class="form-note" data-i18n="description_note">يرجى كتابة وصف شامل للقطعة يشمل جميع التفاصيل المهمة</p>
         </div>
         <div class="form-group">
-          <label for="published_by">النشر:</label>
-          <textarea id="published_by" class="large-textarea" placeholder="مثلاً: د. فلان في كتاب كذا، أو أي تفاصيل أخرى عن النشر..."></textarea>
+          <label for="published_by" data-i18n="published_by">النشر:</label>
+          <textarea id="published_by" class="large-textarea" data-i18n-placeholder="published_by_placeholder" placeholder="مثلاً: د. فلان في كتاب كذا، أو أي تفاصيل أخرى عن النشر..."></textarea>
         </div>
         <div class="form-group">
-          <label class="required" for="documenter">اسم الموثق:</label>
+          <label class="required" for="documenter" data-i18n="documenter_name">اسم الموثق:</label>
           <input type="text" id="documenter" required>
         </div>
         <div class="form-group">
-          <label class="required" for="documentation_date">تاريخ التوثيق:</label>
+          <label class="required" for="documentation_date" data-i18n="documentation_date">تاريخ التوثيق:</label>
           <input type="date" id="documentation_date" required>
         </div>
       </div>
     </div>
 
     <div class="optional-section">
-      <h2 class="section-title"><i class="fas fa-plus-circle"></i> معلومات إضافية (اختيارية)</h2>
+      <h2 class="section-title"><i class="fas fa-plus-circle"></i> <span data-i18n="additional_info">معلومات إضافية (اختيارية)</span></h2>
       <div class="form-row">
         <div class="form-group">
-          <label for="catalog_number">رقم الكتالوج:</label>
+          <label for="catalog_number" data-i18n="catalog_number">رقم الكتالوج:</label>
           <input type="text" id="catalog_number">
         </div>
         <div class="form-group">
-          <label for="card_number">رقم البطاقة:</label>
+          <label for="card_number" data-i18n="card_number">رقم البطاقة:</label>
           <input type="text" id="card_number">
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label for="guide_number">رقم الدليل:</label>
+          <label for="guide_number" data-i18n="guide_number">رقم الدليل:</label>
           <input type="text" id="guide_number">
         </div>
         <div class="form-group">
-          <label for="previous_number">رقم سابق:</label>
+          <label for="previous_number" data-i18n="previous_number">رقم سابق:</label>
           <input type="text" id="previous_number">
         </div>
       </div>
-      <h3 class="section-title" style="margin-top: 30px; font-size: 18px;"><i class="fas fa-map-marker-alt"></i> معلومات الموقع</h3>
+      <h3 class="section-title" style="margin-top: 30px; font-size: 18px;"><i class="fas fa-map-marker-alt"></i> <span data-i18n="location_info">معلومات الموقع</span></h3>
       <div class="form-row">
         <div class="form-group">
-          <label for="storage_location">مكان الحفظ الحالي:</label>
+          <label for="storage_location" data-i18n="storage_location">مكان الحفظ الحالي:</label>
           <input type="text" id="storage_location">
         </div>
         <div class="form-group">
-          <label for="room">الغرفة/القاعة:</label>
+          <label for="room" data-i18n="room">الغرفة/القاعة:</label>
           <input type="text" id="room">
         </div>
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label for="safe">الخزنة/العرض:</label>
+          <label for="safe" data-i18n="safe">الخزنة/العرض:</label>
           <input type="text" id="safe">
         </div>
         <div class="form-group">
-          <label for="storage">المخزن:</label>
+          <label for="storage" data-i18n="storage">المخزن:</label>
           <input type="text" id="storage">
         </div>
       </div>
       <div class="form-group">
-        <label for="shelf">الرف/الوحدة:</label>
+        <label for="shelf" data-i18n="shelf">الرف/الوحدة:</label>
         <input type="text" id="shelf">
       </div>
       <div class="form-group">
-        <label for="previous_location">المكان السابق للحفظ (إن وجد):</label>
+        <label for="previous_location" data-i18n="previous_location">المكان السابق للحفظ (إن وجد):</label>
         <input type="text" id="previous_location">
       </div>
     </div>
 
     <div class="submit-section">
       <button type="button" class="btn btn-primary submit-btn" id="saveBtn">
-        <i class="fas fa-save"></i> حفظ البيانات (HTML)
+        <i class="fas fa-save"></i> <span data-i18n="save_data">حفظ البيانات (HTML)</span>
       </button>
     </div>
   </form>
@@ -614,18 +671,204 @@
   <div class="designer-credit">
     <div class="designer-title">
       <i class="fas fa-palette"></i>
-      <span>تصميم وإشراف</span>
+      <span data-i18n="design_supervision">تصميم وإشراف</span>
     </div>
     <a href="https://reach.link/salahalhusaini" target="_blank">
       د. صلاح الحسيني
     </a>
-    <div class="designer-badge">
+    <div class="designer-badge" data-i18n="designer_title">
       خبير الآثار والتراث الثقافي
     </div>
   </div>
 </div>
 
 <script>
+  // --- Language Switching Functionality ---
+  const translations = {
+    ar: {
+      system_title: "نظام توثيق القطع الأثرية والتراثية في المتاحف",
+      system_subtitle: "نموذج شامل لتوثيق وحفظ المعلومات الأساسية للقطع المتحفية",
+      view_index: "عرض فهرس القطع الأثرية",
+      view_gallery: "عرض معرض الصور",
+      basic_info: "المعلومات الأساسية",
+      museum_name: "اسم المتحف:",
+      artifact_type: "نوع القطعة:",
+      artifact_type_placeholder: "مثال: تمثال، كأس، خاتم",
+      piece_number: "رقم القطعة:",
+      record_number: "رقم السجل:",
+      discovery_place: "مكان العثور:",
+      discovery_place_placeholder: "المدينة/الموقع الأثري",
+      source: "مصدر القطعة:",
+      select_source: "-- اختر المصدر --",
+      gift: "هدية",
+      purchase: "شراء",
+      donation: "هبة",
+      loan: "إعارة",
+      excavation: "تنقيب",
+      unknown: "مجهول",
+      other: "أخرى",
+      acquisition_date: "تاريخ الحيازة:",
+      material: "المادة:",
+      material_placeholder: "مثل: خزف، برونز، فخار، حجر",
+      color: "اللون:",
+      dimensions: "المقاسات:",
+      dimensions_placeholder: "أدخل جميع المقاسات المراد توثيقها",
+      time_period: "الفترة الزمنية:",
+      time_period_placeholder: "مثل: القرن الأول الميلادي، العصر الحجري الحديث",
+      condition: "الحالة العامة للقطعة:",
+      select_condition: "-- اختر الحالة --",
+      excellent: "ممتازة",
+      good: "جيدة",
+      average: "متوسطة",
+      poor: "سيئة",
+      needs_restoration: "تحتاج ترميم",
+      image_description: "الصورة والوصف",
+      no_image_selected: "لم يتم اختيار صورة",
+      image_required: "* الصورة مطلوبة",
+      choose_image: "اختر صورة",
+      clear: "مسح",
+      description: "الوصف التفصيلي:",
+      description_placeholder: "وصف القطعة الأثرية، زخارفها، نقوشها، أي تفاصيل مميزة...",
+      description_note: "يرجى كتابة وصف شامل للقطعة يشمل جميع التفاصيل المهمة",
+      published_by: "النشر:",
+      published_by_placeholder: "مثلاً: د. فلان في كتاب كذا، أو أي تفاصيل أخرى عن النشر...",
+      documenter_name: "اسم الموثق:",
+      documentation_date: "تاريخ التوثيق:",
+      additional_info: "معلومات إضافية (اختيارية)",
+      catalog_number: "رقم الكتالوج:",
+      card_number: "رقم البطاقة:",
+      guide_number: "رقم الدليل:",
+      previous_number: "رقم سابق:",
+      location_info: "معلومات الموقع",
+      storage_location: "مكان الحفظ الحالي:",
+      room: "الغرفة/القاعة:",
+      safe: "الخزنة/العرض:",
+      storage: "المخزن:",
+      shelf: "الرف/الوحدة:",
+      previous_location: "المكان السابق للحفظ (إن وجد):",
+      save_data: "حفظ البيانات (HTML)",
+      design_supervision: "تصميم وإشراف",
+      designer_title: "خبير الآثار والتراث الثقافي"
+    },
+    en: {
+      system_title: "Museum Artifacts Documentation System",
+      system_subtitle: "Comprehensive form for documenting and preserving museum artifacts information",
+      view_index: "View Artifacts Index",
+      view_gallery: "View Image Gallery",
+      basic_info: "Basic Information",
+      museum_name: "Museum Name:",
+      artifact_type: "Artifact Type:",
+      artifact_type_placeholder: "e.g., Statue, Cup, Ring",
+      piece_number: "Piece Number:",
+      record_number: "Record Number:",
+      discovery_place: "Discovery Place:",
+      discovery_place_placeholder: "City/Archaeological Site",
+      source: "Artifact Source:",
+      select_source: "-- Select Source --",
+      gift: "Gift",
+      purchase: "Purchase",
+      donation: "Donation",
+      loan: "Loan",
+      excavation: "Excavation",
+      unknown: "Unknown",
+      other: "Other",
+      acquisition_date: "Acquisition Date:",
+      material: "Material:",
+      material_placeholder: "e.g., Ceramic, Bronze, Pottery, Stone",
+      color: "Color:",
+      dimensions: "Dimensions:",
+      dimensions_placeholder: "Enter all dimensions to be documented",
+      time_period: "Time Period:",
+      time_period_placeholder: "e.g., 1st Century AD, Neolithic Age",
+      condition: "Artifact Condition:",
+      select_condition: "-- Select Condition --",
+      excellent: "Excellent",
+      good: "Good",
+      average: "Average",
+      poor: "Poor",
+      needs_restoration: "Needs Restoration",
+      image_description: "Image and Description",
+      no_image_selected: "No image selected",
+      image_required: "* Image is required",
+      choose_image: "Choose Image",
+      clear: "Clear",
+      description: "Detailed Description:",
+      description_placeholder: "Description of the artifact, its decorations, inscriptions, any distinctive features...",
+      description_note: "Please write a comprehensive description including all important details",
+      published_by: "Published By:",
+      published_by_placeholder: "e.g., Dr. X in Book Y, or any other publication details...",
+      documenter_name: "Documenter Name:",
+      documentation_date: "Documentation Date:",
+      additional_info: "Additional Information (Optional)",
+      catalog_number: "Catalog Number:",
+      card_number: "Card Number:",
+      guide_number: "Guide Number:",
+      previous_number: "Previous Number:",
+      location_info: "Location Information",
+      storage_location: "Current Storage Location:",
+      room: "Room/Hall:",
+      safe: "Safe/Display:",
+      storage: "Storage:",
+      shelf: "Shelf/Unit:",
+      previous_location: "Previous Storage Location (if any):",
+      save_data: "Save Data (HTML)",
+      design_supervision: "Design and Supervision",
+      designer_title: "Heritage and Antiquities Expert"
+    }
+  };
+
+  function switchLanguage(lang) {
+    // Update HTML direction
+    document.documentElement.lang = lang;
+    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+    
+    // Update active button
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.lang === lang);
+    });
+    
+    // Update all translatable elements
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (translations[lang][key]) {
+        el.textContent = translations[lang][key];
+      }
+    });
+    
+    // Update placeholders
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const key = el.getAttribute('data-i18n-placeholder');
+      if (translations[lang][key]) {
+        el.placeholder = translations[lang][key];
+      }
+    });
+    
+    // Update select options (needs to be handled differently)
+    const selectElements = document.querySelectorAll('select');
+    selectElements.forEach(select => {
+      const options = select.querySelectorAll('option');
+      options.forEach(option => {
+        if (option.hasAttribute('data-i18n')) {
+          const key = option.getAttribute('data-i18n');
+          if (translations[lang][key]) {
+            option.textContent = translations[lang][key];
+          }
+        }
+      });
+    });
+  }
+
+  // Initialize language switcher buttons
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const lang = this.dataset.lang;
+      switchLanguage(lang);
+    });
+  });
+
+  // Initialize with Arabic
+  switchLanguage('ar');
+
   // --- JavaScript Logic ---
 
   let artifactsFolderHandle;
@@ -641,13 +884,13 @@
     if (file) {
       const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
       if (!validTypes.includes(file.type)) {
-        alert('الرجاء اختيار صورة بصيغة JPEG, PNG, GIF, أو WEBP');
+        alert(lang === 'ar' ? 'الرجاء اختيار صورة بصيغة JPEG, PNG, GIF, أو WEBP' : 'Please select an image in JPEG, PNG, GIF, or WEBP format');
         event.target.value = '';
         clearImage();
         return;
       }
       if (file.size > 5 * 1024 * 1024) {
-        alert('حجم الصورة يجب أن يكون أقل من 5MB');
+        alert(lang === 'ar' ? 'حجم الصورة يجب أن يكون أقل من 5MB' : 'Image size must be less than 5MB');
         event.target.value = '';
         clearImage();
         return;
@@ -668,10 +911,11 @@
   function clearImage() {
     const imagePreview = document.getElementById('imagePreview');
     const requiredNote = document.querySelector('.image-required-note');
+    const lang = document.documentElement.lang;
     
     imagePreview.innerHTML = `
        <i class="fas fa-image"></i>
-       <span>لم يتم اختيار صورة</span>
+       <span data-i18n="no_image_selected">${lang === 'ar' ? 'لم يتم اختيار صورة' : 'No image selected'}</span>
     `;
     imagePreview.classList.remove('has-image');
     imagePreview.classList.add('required');
@@ -683,6 +927,7 @@
     const imageInput = document.getElementById('imageUpload');
     const imagePreview = document.getElementById('imagePreview');
     const requiredNote = document.querySelector('.image-required-note');
+    const lang = document.documentElement.lang;
     
     if (!imageInput.files || imageInput.files.length === 0) {
       imagePreview.classList.add('required');
@@ -703,8 +948,9 @@
 
   // --- HTML Saving Functions ---
   async function selectBaseFolder() {
+    const lang = document.documentElement.lang;
     if (!window.showDirectoryPicker) {
-       alert("متصفحك لا يدعم واجهة برمجة تطبيقات نظام الملفات (File System Access API). وظيفة الحفظ كـ HTML لن تعمل.");
+       alert(lang === 'ar' ? "متصفحك لا يدعم واجهة برمجة تطبيقات نظام الملفات (File System Access API). وظيفة الحفظ كـ HTML لن تعمل." : "Your browser doesn't support the File System Access API. HTML saving functionality won't work.");
        return false;
     }
     try {
@@ -712,23 +958,24 @@
       baseFolderHandle = dirHandle;
       artifactsFolderHandle = await dirHandle.getDirectoryHandle('artifacts', { create: true });
       uploadsFolderHandle = await dirHandle.getDirectoryHandle('uploads', { create: true });
-      console.log("تم اختيار المجلد الأساسي:", baseFolderHandle.name);
+      console.log(lang === 'ar' ? "تم اختيار المجلد الأساسي:" : "Base folder selected:", baseFolderHandle.name);
       return true;
     } catch (error) {
       if (error.name === 'AbortError') {
-        console.log('User cancelled folder selection.');
+        console.log(lang === 'ar' ? 'تم إلغاء اختيار المجلد من قبل المستخدم.' : 'User cancelled folder selection.');
       } else {
-        console.error('Error selecting folder:', error);
-        alert('لم يتم اختيار مجلد الحفظ أو هناك مشكلة في الوصول إليه: ' + error.message);
+        console.error(lang === 'ar' ? 'خطأ في اختيار المجلد:' : 'Error selecting folder:', error);
+        alert((lang === 'ar' ? 'لم يتم اختيار مجلد الحفظ أو هناك مشكلة في الوصول إليه: ' : 'Folder not selected or there was a problem accessing it: ') + error.message);
       }
       return false;
     }
   }
 
   async function saveArtifact() {
+    const lang = document.documentElement.lang;
     const pieceNumber = document.getElementById('piece_number').value;
     if (!pieceNumber) {
-      alert('يرجى إدخال رقم القطعة لتسمية الملف.');
+      alert(lang === 'ar' ? 'يرجى إدخال رقم القطعة لتسمية الملف.' : 'Please enter piece number to name the file.');
       document.getElementById('piece_number').focus();
       return;
     }
@@ -754,29 +1001,29 @@
     }
     
     if (!isValid) {
-      alert('الرجاء ملء جميع الحقول المطلوبة (المميزة بعلامة *) والتأكد من إضافة صورة للقطعة');
+      alert(lang === 'ar' ? 'الرجاء ملء جميع الحقول المطلوبة (المميزة بعلامة *) والتأكد من إضافة صورة للقطعة' : 'Please fill all required fields (marked with *) and ensure an image is added');
       if (firstInvalidField) firstInvalidField.focus();
       return;
     }
 
     if (!baseFolderHandle || !artifactsFolderHandle || !uploadsFolderHandle) {
-        console.log("Requesting folder selection...");
+        console.log(lang === 'ar' ? "طلب اختيار مجلد..." : "Requesting folder selection...");
         const folderSelected = await selectBaseFolder();
         if (!folderSelected) return;
     } else {
         try {
             const permissionStatus = await baseFolderHandle.queryPermission({ mode: 'readwrite' });
             if (permissionStatus !== 'granted') {
-                console.log("Requesting permission for existing handle...");
+                console.log(lang === 'ar' ? "طلب الإذن للوصول إلى المجلد..." : "Requesting permission for existing handle...");
                 if (await baseFolderHandle.requestPermission({ mode: 'readwrite' }) !== 'granted') {
-                    alert("تم رفض الإذن للكتابة في المجلد المحدد.");
+                    alert(lang === 'ar' ? "تم رفض الإذن للكتابة في المجلد المحدد." : "Permission to write to the selected folder was denied.");
                     baseFolderHandle = null; artifactsFolderHandle = null; uploadsFolderHandle = null;
                     return;
                 }
             }
         } catch (permError) {
-            console.error("Error verifying/requesting permission:", permError);
-            alert("حدث خطأ أثناء التحقق من أذونات المجلد.");
+            console.error(lang === 'ar' ? "خطأ في التحقق من الأذونات:" : "Error verifying/requesting permission:", permError);
+            alert(lang === 'ar' ? "حدث خطأ أثناء التحقق من أذونات المجلد." : "Error occurred while verifying folder permissions.");
             baseFolderHandle = null; artifactsFolderHandle = null; uploadsFolderHandle = null;
             return;
         }
@@ -784,14 +1031,14 @@
 
     const saveButton = document.getElementById('saveBtn');
     saveButton.disabled = true;
-    saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الحفظ...';
+    saveButton.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${lang === 'ar' ? 'جاري الحفظ...' : 'Saving...'}`;
     try {
       const htmlContent = generateArtifactHTML(pieceNumber, null);
       const htmlFileHandle = await artifactsFolderHandle.getFileHandle(`${pieceNumber}.html`, { create: true });
       const writableHtml = await htmlFileHandle.createWritable();
       await writableHtml.write(htmlContent);
       await writableHtml.close();
-      console.log(`HTML file ${pieceNumber}.html saved successfully.`);
+      console.log(lang === 'ar' ? `تم حفظ ملف HTML ${pieceNumber}.html بنجاح.` : `HTML file ${pieceNumber}.html saved successfully.`);
 
       const imageInput = document.getElementById('imageUpload');
       if (imageInput.files && imageInput.files[0]) {
@@ -802,29 +1049,31 @@
         const writableImage = await imageFileHandle.createWritable();
         await writableImage.write(await file.arrayBuffer());
         await writableImage.close();
-        console.log(`Image file ${imageFileName} saved successfully.`);
+        console.log(lang === 'ar' ? `تم حفظ ملف الصورة ${imageFileName} بنجاح.` : `Image file ${imageFileName} saved successfully.`);
       }
-      alert(`تم حفظ القطعة رقم ${pieceNumber} بنجاح في المجلد المحدد.`);
+      alert(lang === 'ar' ? `تم حفظ القطعة رقم ${pieceNumber} بنجاح في المجلد المحدد.` : `Artifact ${pieceNumber} saved successfully in the selected folder.`);
       resetForm();
     } catch (error) {
-      console.error('Error saving artifact:', error);
-      alert('حدث خطأ أثناء حفظ الملف: ' + error.message + "\n قد تحتاج إلى إعادة منح الإذن للمجلد أو إعادة اختياره.");
+      console.error(lang === 'ar' ? 'خطأ في حفظ القطعة:' : 'Error saving artifact:', error);
+      alert((lang === 'ar' ? 'حدث خطأ أثناء حفظ الملف: ' : 'Error occurred while saving the file: ') + error.message + (lang === 'ar' ? "\n قد تحتاج إلى إعادة منح الإذن للمجلد أو إعادة اختياره." : "\n You may need to re-grant folder permission or reselect it."));
     } finally {
         saveButton.disabled = false;
-        saveButton.innerHTML = '<i class="fas fa-save"></i> حفظ البيانات (HTML)';
+        const saveText = lang === 'ar' ? 'حفظ البيانات (HTML)' : 'Save Data (HTML)';
+        saveButton.innerHTML = `<i class="fas fa-save"></i> ${saveText}`;
     }
   }
 
   // --- HTML Generation Function ---
   function generateArtifactHTML(pieceNumber, imageDataUrl = null) {
+      const lang = document.documentElement.lang;
       const imageInput = document.getElementById('imageUpload');
       let imageHtml = '';
       if (imageDataUrl) {
         imageHtml = `
         <div class="info-row artifact-image-row">
-          <div class="info-label">الصورة:</div>
+          <div class="info-label">${lang === 'ar' ? 'الصورة:' : 'Image:'}</div>
           <div class="info-value">
-            <img src="${imageDataUrl}" alt="صورة القطعة ${pieceNumber}" class="artifact-image">
+            <img src="${imageDataUrl}" alt="${lang === 'ar' ? 'صورة القطعة' : 'Artifact image'} ${pieceNumber}" class="artifact-image">
           </div>
         </div>`;
       } else if (imageInput.files && imageInput.files[0]) {
@@ -832,16 +1081,16 @@
         const imageFileName = `${pieceNumber}.${fileExtension}`;
         imageHtml = `
         <div class="info-row artifact-image-row">
-          <div class="info-label">الصورة:</div>
+          <div class="info-label">${lang === 'ar' ? 'الصورة:' : 'Image:'}</div>
           <div class="info-value">
-            <img src="../uploads/${imageFileName}" alt="صورة القطعة ${pieceNumber}" class="artifact-image" onerror="this.style.display='none'; this.parentElement.innerHTML+=' (ملف الصورة غير موجود أو المسار خاطئ)';">
+            <img src="../uploads/${imageFileName}" alt="${lang === 'ar' ? 'صورة القطعة' : 'Artifact image'} ${pieceNumber}" class="artifact-image" onerror="this.style.display='none'; this.parentElement.innerHTML+=' ${lang === 'ar' ? '(ملف الصورة غير موجود أو المسار خاطئ)' : '(Image file missing or wrong path)'}';">
           </div>
         </div>`;
       }
 
-      const museum = document.getElementById('museum').value || 'غير محدد';
-      const artifact_type = document.getElementById('artifact_type').value || 'غير محدد';
-      const current_piece_number = document.getElementById('piece_number').value || 'غير محدد';
+      const museum = document.getElementById('museum').value || (lang === 'ar' ? 'غير محدد' : 'Not specified');
+      const artifact_type = document.getElementById('artifact_type').value || (lang === 'ar' ? 'غير محدد' : 'Not specified');
+      const current_piece_number = document.getElementById('piece_number').value || (lang === 'ar' ? 'غير محدد' : 'Not specified');
       const record_number = document.getElementById('record_number').value;
       const discovery_place = document.getElementById('discovery_place').value;
       const source = document.getElementById('source').value;
@@ -851,10 +1100,10 @@
       const dimensions = document.getElementById('dimensions').value;
       const time_period = document.getElementById('time_period').value;
       const condition = document.getElementById('condition').value;
-      const description = document.getElementById('description').value || 'لا يوجد وصف.';
+      const description = document.getElementById('description').value || (lang === 'ar' ? 'لا يوجد وصف.' : 'No description.');
       const published_by = document.getElementById('published_by').value;
-      const documenter = document.getElementById('documenter').value || 'غير محدد';
-      const documentation_date = document.getElementById('documentation_date').value || 'غير محدد';
+      const documenter = document.getElementById('documenter').value || (lang === 'ar' ? 'غير محدد' : 'Not specified');
+      const documentation_date = document.getElementById('documentation_date').value || (lang === 'ar' ? 'غير محدد' : 'Not specified');
       const catalog_number = document.getElementById('catalog_number').value;
       const card_number = document.getElementById('card_number').value;
       const guide_number = document.getElementById('guide_number').value;
@@ -875,16 +1124,16 @@
        };
 
       return `<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="${lang}" dir="${lang === 'ar' ? 'rtl' : 'ltr'}">
 <head>
   <meta charset="UTF-8">
-  <title>توثيق: ${current_piece_number} - ${artifact_type}</title>
+  <title>${lang === 'ar' ? 'توثيق:' : 'Documentation:'} ${current_piece_number} - ${artifact_type}</title>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     body {
-        font-family: 'Tajawal', Arial, sans-serif !important;
+        font-family: ${lang === 'ar' ? "'Tajawal', Arial, sans-serif" : "Arial, sans-serif"} !important;
         line-height: 1.8 !important;
-        direction: rtl;
+        direction: ${lang === 'ar' ? 'rtl' : 'ltr'};
         padding: 15mm;
         color: #333;
         font-size: 11pt;
@@ -907,7 +1156,7 @@
         width: 45mm;
         color: #004445;
         flex-shrink: 0;
-        padding-left: 4mm;
+        ${lang === 'ar' ? 'padding-left: 4mm;' : 'padding-right: 4mm;'}
         vertical-align: top;
         line-height: 1.8 !important;
     }
@@ -917,7 +1166,7 @@
         white-space: pre-wrap;
         vertical-align: top;
         line-height: 1.8 !important;
-         text-align: right;
+        text-align: ${lang === 'ar' ? 'right' : 'left'};
     }
     .artifact-image { max-width: 100%; height: auto; display: block; margin: 5mm auto; border-radius: 4px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); page-break-inside: avoid; max-height: 100mm; object-fit: contain;}
     .artifact-image-row { border-bottom: none; margin-bottom: 8mm; }
@@ -927,45 +1176,45 @@
         h1 { margin-bottom: 10mm; font-size: 14pt;}
         .pdf-section-heading { margin-top: 8mm; margin-bottom: 4mm; font-size: 12pt; }
         .info-row { margin-bottom: 4mm; padding-bottom: 3mm; }
-        .info-label { width: 40mm; padding-left: 3mm;}
+        .info-label { width: 40mm; ${lang === 'ar' ? 'padding-left: 3mm;' : 'padding-right: 3mm;'} }
      }
   </style>
 </head>
 <body>
   <div class="artifact-container" id="pdfContent">
-    <h1>توثيق قطعة أثرية: ${artifact_type} (${current_piece_number})</h1>
-    <h2 class="pdf-section-heading">المعلومات الأساسية</h2>
-    ${createRow('اسم المتحف', museum)}
-    ${createRow('نوع القطعة', artifact_type)}
-    ${createRow('رقم القطعة', current_piece_number)}
-    ${createRow('رقم السجل', record_number)}
-    ${createRow('مكان العثور', discovery_place)}
-    ${createRow('مصدر القطعة', source)}
-    ${createRow('تاريخ الحيازة', acquisition_date)}
-    ${createRow('المادة', material)}
-    ${createRow('اللون', color)}
-    ${createRow('المقاسات', dimensions)}
-    ${createRow('الفترة الزمنية', time_period)}
-    ${createRow('الحالة العامة', condition)}
+    <h1>${lang === 'ar' ? 'توثيق قطعة أثرية:' : 'Artifact Documentation:'} ${artifact_type} (${current_piece_number})</h1>
+    <h2 class="pdf-section-heading">${lang === 'ar' ? 'المعلومات الأساسية' : 'Basic Information'}</h2>
+    ${createRow(lang === 'ar' ? 'اسم المتحف' : 'Museum Name', museum)}
+    ${createRow(lang === 'ar' ? 'نوع القطعة' : 'Artifact Type', artifact_type)}
+    ${createRow(lang === 'ar' ? 'رقم القطعة' : 'Piece Number', current_piece_number)}
+    ${createRow(lang === 'ar' ? 'رقم السجل' : 'Record Number', record_number)}
+    ${createRow(lang === 'ar' ? 'مكان العثور' : 'Discovery Place', discovery_place)}
+    ${createRow(lang === 'ar' ? 'مصدر القطعة' : 'Artifact Source', source)}
+    ${createRow(lang === 'ar' ? 'تاريخ الحيازة' : 'Acquisition Date', acquisition_date)}
+    ${createRow(lang === 'ar' ? 'المادة' : 'Material', material)}
+    ${createRow(lang === 'ar' ? 'اللون' : 'Color', color)}
+    ${createRow(lang === 'ar' ? 'المقاسات' : 'Dimensions', dimensions)}
+    ${createRow(lang === 'ar' ? 'الفترة الزمنية' : 'Time Period', time_period)}
+    ${createRow(lang === 'ar' ? 'الحالة العامة' : 'Condition', condition)}
     ${imageHtml}
-    <h2 class="pdf-section-heading">الوصف والنشر</h2>
-    ${createRow('الوصف التفصيلي', description)}
-    ${createRow('النشر', published_by)}
-    ${createSectionHeading('أرقام إضافية', catalog_number, card_number, guide_number, previous_number)}
-    ${createRow('رقم الكتالوج', catalog_number)}
-    ${createRow('رقم البطاقة', card_number)}
-    ${createRow('رقم الدليل', guide_number)}
-    ${createRow('رقم سابق', previous_number)}
-    ${createSectionHeading('معلومات الموقع والحفظ', storage_location, room, safe, storage, shelf, previous_location)}
-    ${createRow('مكان الحفظ الحالي', storage_location)}
-    ${createRow('الغرفة/القاعة', room)}
-    ${createRow('الخزنة/العرض', safe)}
-    ${createRow('المخزن', storage)}
-    ${createRow('الرف/الوحدة', shelf)}
-    ${createRow('المكان السابق للحفظ', previous_location)}
-    <h2 class="pdf-section-heading">معلومات التوثيق</h2>
-    ${createRow('اسم الموثق', documenter)}
-    ${createRow('تاريخ التوثيق', documentation_date)}
+    <h2 class="pdf-section-heading">${lang === 'ar' ? 'الوصف والنشر' : 'Description and Publication'}</h2>
+    ${createRow(lang === 'ar' ? 'الوصف التفصيلي' : 'Detailed Description', description)}
+    ${createRow(lang === 'ar' ? 'النشر' : 'Published By', published_by)}
+    ${createSectionHeading(lang === 'ar' ? 'أرقام إضافية' : 'Additional Numbers', catalog_number, card_number, guide_number, previous_number)}
+    ${createRow(lang === 'ar' ? 'رقم الكتالوج' : 'Catalog Number', catalog_number)}
+    ${createRow(lang === 'ar' ? 'رقم البطاقة' : 'Card Number', card_number)}
+    ${createRow(lang === 'ar' ? 'رقم الدليل' : 'Guide Number', guide_number)}
+    ${createRow(lang === 'ar' ? 'رقم سابق' : 'Previous Number', previous_number)}
+    ${createSectionHeading(lang === 'ar' ? 'معلومات الموقع والحفظ' : 'Location and Storage Information', storage_location, room, safe, storage, shelf, previous_location)}
+    ${createRow(lang === 'ar' ? 'مكان الحفظ الحالي' : 'Current Storage Location', storage_location)}
+    ${createRow(lang === 'ar' ? 'الغرفة/القاعة' : 'Room/Hall', room)}
+    ${createRow(lang === 'ar' ? 'الخزنة/العرض' : 'Safe/Display', safe)}
+    ${createRow(lang === 'ar' ? 'المخزن' : 'Storage', storage)}
+    ${createRow(lang === 'ar' ? 'الرف/الوحدة' : 'Shelf/Unit', shelf)}
+    ${createRow(lang === 'ar' ? 'المكان السابق للحفظ' : 'Previous Storage Location', previous_location)}
+    <h2 class="pdf-section-heading">${lang === 'ar' ? 'معلومات التوثيق' : 'Documentation Information'}</h2>
+    ${createRow(lang === 'ar' ? 'اسم الموثق' : 'Documenter Name', documenter)}
+    ${createRow(lang === 'ar' ? 'تاريخ التوثيق' : 'Documentation Date', documentation_date)}
   </div>
 </body>
 </html>`;
@@ -990,21 +1239,23 @@
 
   // --- Index File Opening Function ---
   async function openArtifactsIndex() {
+    const lang = document.documentElement.lang;
     try {
       window.open('artifacts_index.html', '_blank');
     } catch (error) {
-      console.error('Error trying to open index:', error);
-      alert("لم يتم العثور على ملف الفهرس (artifacts_index.html) أو حدث خطأ أثناء محاولة فتحه.");
+      console.error(lang === 'ar' ? 'خطأ في فتح الفهرس:' : 'Error trying to open index:', error);
+      alert(lang === 'ar' ? "لم يتم العثور على ملف الفهرس (artifacts_index.html) أو حدث خطأ أثناء محاولة فتحه." : "Index file (artifacts_index.html) not found or error occurred while trying to open it.");
     }
   }
 
   // --- Gallery File Opening Function ---
   async function openGallery() {
+    const lang = document.documentElement.lang;
     try {
       window.open('pic_index.html', '_blank');
     } catch (error) {
-      console.error('Error trying to open gallery:', error);
-      alert("لم يتم العثور على ملف معرض الصور (pic_index.html) أو حدث خطأ أثناء محاولة فتحه.");
+      console.error(lang === 'ar' ? 'خطأ في فتح المعرض:' : 'Error trying to open gallery:', error);
+      alert(lang === 'ar' ? "لم يتم العثور على ملف معرض الصور (pic_index.html) أو حدث خطأ أثناء محاولة فتحه." : "Gallery file (pic_index.html) not found or error occurred while trying to open it.");
     }
   }
 
