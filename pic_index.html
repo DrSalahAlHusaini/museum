@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" id="htmlElement">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -227,24 +227,78 @@
     .cancel-btn:hover {
       background-color: #c82333;
     }
+    
+    /* زر تبديل اللغة */
+    .language-switcher {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1000;
+    }
+    
+    .language-btn {
+      background-color: var(--primary-color);
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 50px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      transition: all 0.3s;
+    }
+    
+    .language-btn:hover {
+      background-color: var(--secondary-color);
+      transform: translateY(-2px);
+    }
+    
+    /* أنماط اللغة الإنجليزية */
+    body.english {
+      direction: ltr;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    body.english .container {
+      text-align: left;
+    }
+    
+    body.english h1 {
+      text-align: center;
+    }
+    
+    body.english .language-switcher {
+      left: auto;
+      right: 20px;
+    }
   </style>
 </head>
 <body>
+  <!-- زر تبديل اللغة -->
+  <div class="language-switcher">
+    <button id="languageBtn" class="language-btn">
+      <i class="fas fa-language"></i>
+      <span id="languageText">English</span>
+    </button>
+  </div>
+
   <div class="container">
-    <h1><i class="fas fa-images"></i> انشاء معرض القطع الأثرية</h1>
+    <h1><i class="fas fa-images"></i> <span class="title-text">انشاء معرض القطع الأثرية</span></h1>
     
     <div class="folder-selector">
-      <label>مجلد الصور (uploads): <span id="uploadsStatus">لم يتم التحديد</span></label>
-      <button id="selectUploadsFolder"><i class="fas fa-folder-open"></i> اختيار مجلد الصور</button>
+      <label><span class="uploads-label">مجلد الصور (uploads):</span> <span id="uploadsStatus">لم يتم التحديد</span></label>
+      <button id="selectUploadsFolder"><i class="fas fa-folder-open"></i> <span class="select-uploads-text">اختيار مجلد الصور</span></button>
     </div>
     
     <div class="folder-selector">
-      <label>مجلد الملفات (artifacts): <span id="artifactsStatus">لم يتم التحديد</span></label>
-      <button id="selectArtifactsFolder"><i class="fas fa-folder-open"></i> اختيار مجلد الملفات</button>
+      <label><span class="artifacts-label">مجلد الملفات (artifacts):</span> <span id="artifactsStatus">لم يتم التحديد</span></label>
+      <button id="selectArtifactsFolder"><i class="fas fa-folder-open"></i> <span class="select-artifacts-text">اختيار مجلد الملفات</span></button>
     </div>
     
     <button id="generateGallery" style="display: none; margin: 20px auto;">
-      <i class="fas fa-cogs"></i> توليد المعرض
+      <i class="fas fa-cogs"></i> <span class="generate-text">توليد المعرض</span>
     </button>
     
     <div id="status" class="status" style="display: none;"></div>
@@ -257,14 +311,14 @@
   <div class="designer-credit">
     <div class="designer-title">
       <i class="fas fa-palette"></i>
-      <span>تصميم وإشراف</span>
+      <span class="designer-text">تصميم وإشراف</span>
     </div>
 
     <a href="https://reach.link/salahalhusaini" target="_blank">
-          <i class="fas fa-user-tie"></i> د. صلاح الحسيني
+          <i class="fas fa-user-tie"></i> <span class="designer-name">د. صلاح الحسيني</span>
     </a>
     <div class="designer-badge">
-      <i class="fas fa-landmark"></i> خبير الآثار والتراث الثقافي
+      <i class="fas fa-landmark"></i> <span class="designer-role">خبير الآثار والتراث الثقافي</span>
     </div>
   </div>
   </footer>
@@ -282,6 +336,97 @@
     const galleryGrid = document.getElementById('galleryGrid');
     const uploadsStatus = document.getElementById('uploadsStatus');
     const artifactsStatus = document.getElementById('artifactsStatus');
+    const languageBtn = document.getElementById('languageBtn');
+    const languageText = document.getElementById('languageText');
+    const htmlElement = document.getElementById('htmlElement');
+    const bodyElement = document.body;
+
+    // نصوص متعددة اللغات
+    const translations = {
+      ar: {
+        title: "انشاء معرض القطع الأثرية",
+        uploadsLabel: "مجلد الصور (uploads):",
+        selectUploads: "اختيار مجلد الصور",
+        artifactsLabel: "مجلد الملفات (artifacts):",
+        selectArtifacts: "اختيار مجلد الملفات",
+        generate: "توليد المعرض",
+        designer: "تصميم وإشراف",
+        designerName: "د. صلاح الحسيني",
+        designerRole: "خبير الآثار والتراث الثقافي",
+        notSelected: "لم يتم التحديد",
+        generating: "جاري إنشاء المعرض...",
+        noImages: "لم يتم العثور على صور في المجلد المحدد",
+        noFolder: "الرجاء اختيار مجلد الصور أولاً",
+        saved: "تم حفظ التغييرات بنجاح",
+        canceled: "تم إلغاء اختيار المجلد",
+        editError: "حدث خطأ أثناء التحرير:",
+        saveError: "حدث خطأ أثناء الحفظ:",
+        viewDetails: "عرض التفاصيل",
+        editText: "تحرير النص",
+        language: "English"
+      },
+      en: {
+        title: "Artifacts Gallery Creator",
+        uploadsLabel: "Images Folder (uploads):",
+        selectUploads: "Select Images Folder",
+        artifactsLabel: "Files Folder (artifacts):",
+        selectArtifacts: "Select Files Folder",
+        generate: "Generate Gallery",
+        designer: "Designed & Supervised by",
+        designerName: "Dr. Salah Al-Husseini",
+        designerRole: "Cultural Heritage & Antiquities Expert",
+        notSelected: "Not selected",
+        generating: "Generating gallery...",
+        noImages: "No images found in selected folder",
+        noFolder: "Please select images folder first",
+        saved: "Changes saved successfully",
+        canceled: "Folder selection canceled",
+        editError: "Error while editing:",
+        saveError: "Error while saving:",
+        viewDetails: "View Details",
+        editText: "Edit Text",
+        language: "العربية"
+      }
+    };
+
+    // تحميل اللغة المحفوظة أو استخدام العربية افتراضياً
+    let currentLang = localStorage.getItem('language') || 'ar';
+    applyLanguage(currentLang);
+
+    // تبديل اللغة
+    languageBtn.addEventListener('click', () => {
+      currentLang = currentLang === 'ar' ? 'en' : 'ar';
+      localStorage.setItem('language', currentLang);
+      applyLanguage(currentLang);
+    });
+
+    // تطبيق اللغة المحددة
+    function applyLanguage(lang) {
+      // تغيير اتجاه الصفحة
+      htmlElement.lang = lang;
+      htmlElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+      bodyElement.className = lang === 'ar' ? '' : 'english';
+      
+      // تحديث النصوص
+      document.querySelector('.title-text').textContent = translations[lang].title;
+      document.querySelector('.uploads-label').textContent = translations[lang].uploadsLabel;
+      document.querySelector('.select-uploads-text').textContent = translations[lang].selectUploads;
+      document.querySelector('.artifacts-label').textContent = translations[lang].artifactsLabel;
+      document.querySelector('.select-artifacts-text').textContent = translations[lang].selectArtifacts;
+      document.querySelector('.generate-text').textContent = translations[lang].generate;
+      document.querySelector('.designer-text').textContent = translations[lang].designer;
+      document.querySelector('.designer-name').textContent = translations[lang].designerName;
+      document.querySelector('.designer-role').textContent = translations[lang].designerRole;
+      languageText.textContent = translations[lang].language;
+      
+      // تحديث حالة المجلدات إذا كانت النصوص معروضة
+      if (uploadsStatus.textContent === translations['ar'].notSelected || uploadsStatus.textContent === translations['en'].notSelected) {
+        uploadsStatus.textContent = translations[lang].notSelected;
+      }
+      if (artifactsStatus.textContent === translations['ar'].notSelected || artifactsStatus.textContent === translations['en'].notSelected) {
+        artifactsStatus.textContent = translations[lang].notSelected;
+      }
+    }
 
     // اختيار المجلدات
     selectUploadsBtn.addEventListener('click', async () => {
@@ -291,7 +436,7 @@
         uploadsStatus.style.color = 'green';
         checkFolders();
       } catch (error) {
-        showStatus('تم إلغاء اختيار المجلد', 'error');
+        showStatus(translations[currentLang].canceled, 'error');
       }
     });
 
@@ -302,7 +447,7 @@
         artifactsStatus.style.color = 'green';
         checkFolders();
       } catch (error) {
-        showStatus('تم إلغاء اختيار المجلد', 'error');
+        showStatus(translations[currentLang].canceled, 'error');
       }
     });
 
@@ -317,11 +462,11 @@
     generateGalleryBtn.addEventListener('click', async () => {
       try {
         if (!uploadsFolderHandle) {
-          showStatus('الرجاء اختيار مجلد الصور أولاً', 'error');
+          showStatus(translations[currentLang].noFolder, 'error');
           return;
         }
 
-        showStatus('جاري إنشاء المعرض...', '');
+        showStatus(translations[currentLang].generating, '');
 
         // قراءة ملفات الصور
         const imageFiles = [];
@@ -336,7 +481,7 @@
         }
 
         if (imageFiles.length === 0) {
-          showStatus('لم يتم العثور على صور في المجلد المحدد', 'error');
+          showStatus(translations[currentLang].noImages, 'error');
           return;
         }
 
@@ -382,10 +527,10 @@
               ${matchingHtml ? `
                 <div class="artifact-actions">
                   <a href="artifacts/${matchingHtml.name}" class="artifact-link" target="_blank">
-                    <i class="fas fa-file-alt"></i> عرض التفاصيل
+                    <i class="fas fa-file-alt"></i> ${translations[currentLang].viewDetails}
                   </a>
                   <button class="edit-btn" data-index="${index}" data-handle-index="${matchingHtmlIndex}">
-                    <i class="fas fa-edit"></i> تحرير النص
+                    <i class="fas fa-edit"></i> ${translations[currentLang].editText}
                   </button>
                 </div>
               ` : ''}
@@ -407,10 +552,10 @@
           });
         });
 
-        showStatus(`تم عرض ${imageFiles.length} صورة بنجاح`, 'success');
+        showStatus(`${imageFiles.length} ${currentLang === 'ar' ? 'تم عرض' : 'images displayed successfully'}`, 'success');
         
       } catch (error) {
-        showStatus(`حدث خطأ: ${error.message}`, 'error');
+        showStatus(`${currentLang === 'ar' ? 'حدث خطأ:' : 'Error:'} ${error.message}`, 'error');
         console.error(error);
       }
     });
@@ -443,11 +588,11 @@
         editor.style.overflow = 'auto';
         
         editor.innerHTML = `
-          <h3 style="text-align: center; margin-bottom: 20px;">تحرير محتوى الملف: ${htmlFile.name}</h3>
+          <h3 style="text-align: center; margin-bottom: 20px;">${currentLang === 'ar' ? 'تحرير محتوى الملف:' : 'Editing file:'} ${htmlFile.name}</h3>
           <div class="editable" contenteditable="true" id="htmlEditor">${content}</div>
           <div style="display: flex; gap: 10px; margin-top: 15px;">
-            <button class="save-btn" id="saveHtml"><i class="fas fa-save"></i> حفظ</button>
-            <button class="cancel-btn" id="cancelEdit"><i class="fas fa-times"></i> إلغاء</button>
+            <button class="save-btn" id="saveHtml"><i class="fas fa-save"></i> ${currentLang === 'ar' ? 'حفظ' : 'Save'}</button>
+            <button class="cancel-btn" id="cancelEdit"><i class="fas fa-times"></i> ${currentLang === 'ar' ? 'إلغاء' : 'Cancel'}</button>
           </div>
         `;
         
@@ -465,10 +610,10 @@
             await writable.write(newContent);
             await writable.close();
             
-            showStatus('تم حفظ التغييرات بنجاح', 'success');
+            showStatus(translations[currentLang].saved, 'success');
             modal.remove();
           } catch (error) {
-            showStatus(`حدث خطأ أثناء الحفظ: ${error.message}`, 'error');
+            showStatus(`${translations[currentLang].saveError} ${error.message}`, 'error');
           }
         });
         
@@ -477,7 +622,7 @@
         });
         
       } catch (error) {
-        showStatus(`حدث خطأ أثناء التحرير: ${error.message}`, 'error');
+        showStatus(`${translations[currentLang].editError} ${error.message}`, 'error');
       }
     }
 
